@@ -27,7 +27,7 @@ struct SessionPlan: Equatable {
     var title: String
     var goalMinutes: Int
     var lives: Int = 3        // 0〜3
-    var peekMinutes: Int = 5  // ライフ1つで見られる分数（1〜60）
+    var peekMinutes: Int = 5  // 1回の中断の分数（1〜60）
     var useBase = true        // 基地スタート（充電器に置いてから はじめる）
 }
 
@@ -83,9 +83,9 @@ final class GameState: ObservableObject {
     @Published var sessionGoal: Int { didSet { Self.ud.set(sessionGoal, forKey: "p.sGoal") } }
     @Published var demoBoost: Double = 0   // デモ用：タイマーを進める秒数
     @Published var lives: Int { didSet { Self.ud.set(lives, forKey: "p.lives") } }
-    /// ちょっとだけ見る（ライフ−1）で、ブロックを止めている終わりの時刻
+    /// 中断（ライフ−1）で、ブロックを止めている終わりの時刻
     @Published var peekUntil: Date? { didSet { Self.ud.set(peekUntil?.timeIntervalSince1970, forKey: "p.peek") } }
-    /// ちょっとだけタイムの間はタイマーを止める（止めていた合計秒・いまの休けいの開始）
+    /// 中断中はタイマーを止める（止めていた合計秒・いまの中断の開始）
     @Published var pausedTotal: Double { didSet { Self.ud.set(pausedTotal, forKey: "p.paused") } }
     @Published var peekStart: Date? { didSet { Self.ud.set(peekStart?.timeIntervalSince1970, forKey: "p.peekStart") } }
     @Published var maxLives: Int { didSet { Self.ud.set(maxLives, forKey: "p.maxLives") } }
@@ -271,7 +271,7 @@ final class GameState: ObservableObject {
         flow = .result(SessionResult(minutes: minutes, bones: gotBones, stars: gotStars, multiplier: mult, baseBonus: bonus))
     }
 
-    /// ちょっとだけ見る：ライフを1つ使って、5分だけブロックを止める
+    /// 中断する：ライフを1つ使って、決めた分数だけブロックを止める
     func peek() {
         guard lives > 0, peekUntil == nil else { return }
         lives -= 1
@@ -281,7 +281,7 @@ final class GameState: ObservableObject {
         Haptic.medium()
     }
 
-    /// 休けいおわり：ブロックをもどして、タイマーを再開
+    /// 中断おわり：ブロックをもどして、タイマーを再開
     func endPeek(at date: Date = Date()) {
         if let ps = peekStart {
             let end = min(date, peekUntil ?? date)

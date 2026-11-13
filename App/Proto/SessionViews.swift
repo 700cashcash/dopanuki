@@ -151,7 +151,7 @@ struct SessionPickView: View {
         return p
     }
 
-    /// 基地スタート／基地なし、ライフ（0〜3）、ライフ1つで見られる分数
+    /// 基地スタート／基地なし、ライフ（0〜3）、1回の中断の分数
     private var rules: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
@@ -181,7 +181,7 @@ struct SessionPickView: View {
             }
             if lives > 0 {
                 HStack {
-                    Text("1ライフで見られる").font(.dp(13, .heavy))
+                    Text("1回の中断").font(.dp(13, .heavy))
                     Spacer()
                     Text("\(peekMin)分").font(.num(20))
                 }
@@ -417,7 +417,7 @@ struct SessionRunView: View {
                     if let left = peekLeft {
                         HStack(spacing: 6) {
                             Image(systemName: "eye.fill").font(.system(size: 12, weight: .bold))
-                            Text("ちょっとだけタイム ").font(.dp(12, .heavy))
+                            Text("中断中 ").font(.dp(12, .heavy))
                             Text(clock(left)).font(.num(14))
                         }
                         .foregroundColor(.black)
@@ -434,7 +434,7 @@ struct SessionRunView: View {
 
             HStack(alignment: .bottom) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(peekLeft != nil ? "いま休けい中" : game.sessionTitle).font(.dp(20, .heavy))
+                    Text(peekLeft != nil ? "中断中" : game.sessionTitle).font(.dp(20, .heavy))
                         .foregroundColor(peekLeft != nil ? DP.yellow : .white)
                     if peekLeft != nil {
                         Text("タイマーは止まってるよ").font(.dp(13, .medium)).foregroundColor(DP.gray)
@@ -517,13 +517,13 @@ struct SessionRunView: View {
     private func peekButton(peeking: Bool) -> some View {
         if game.lives > 0 {
             Button { askEnd = true } label: {
-                Label(peeking ? "ちょっとだけタイム中" : "ちょっとだけ見る（ライフ−1）", systemImage: "eye")
+                Label(peeking ? "中断中" : "中断する（ライフ−1）", systemImage: "pause.fill")
             }
             .buttonStyle(PuffyStyle(color: .white, height: 58, strong: false))
             .disabled(peeking)
             .opacity(peeking ? 0.5 : 1)
-            .alert("ライフを1つ使う？", isPresented: $askEnd) {
-                Button("\(game.peekMinutes)分だけ見る") { game.peek() }
+            .alert("ライフを1つ使って中断する？", isPresented: $askEnd) {
+                Button("\(game.peekMinutes)分 中断する") { game.peek() }
                 Button("やっぱりやめる", role: .cancel) {}
             } message: {
                 Text("\(game.peekMinutes)分たつと、またブロックにもどるよ。ライフはのこり\(game.lives)こ。")
