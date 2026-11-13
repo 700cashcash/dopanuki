@@ -218,6 +218,9 @@ struct RoomView: View {
         #if DEBUG
         .onAppear {
             // スクショ確認用: -debugAct sneeze|ear|tickle|yawn|ask
+            let sheet = UserDefaults.standard.string(forKey: "debugSheet")
+            if sheet == "gacha" { showGacha = true }
+            if sheet == "night" { showNight = true }
             guard let act = UserDefaults.standard.string(forKey: "debugAct") else { return }
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 switch act {

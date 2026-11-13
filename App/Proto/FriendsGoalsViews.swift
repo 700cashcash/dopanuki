@@ -74,7 +74,12 @@ struct FriendsView: View {
             .padding(.bottom, 24)
         }
         .background(TopGlow(color: Color(hex: 0x1E9E5E).opacity(0.6), reach: 0.35))
-        .onAppear { steps.refresh() }
+        .onAppear {
+            steps.refresh()
+            #if DEBUG
+            if UserDefaults.standard.object(forKey: "debugSeg") != nil { seg = UserDefaults.standard.integer(forKey: "debugSeg") }
+            #endif
+        }
     }
 
     private var headline: String {

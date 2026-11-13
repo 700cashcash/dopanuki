@@ -25,6 +25,9 @@ enum NightLock {
     /// はじめての夜（と、ねる時間をかえたとき）だけ、犬が予告する。予告するセリフを返す
     static func takeNotice() -> String? {
         guard isOn, isReady else { return nil }
+        #if DEBUG
+        if UserDefaults.standard.bool(forKey: "debugNoNotice") { return nil }   // スクショ用
+        #endif
         let key = "\(start)-\(end)"
         let d = UserDefaults.standard
         guard d.string(forKey: "p.nightNotice") != key else { return nil }

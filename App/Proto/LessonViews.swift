@@ -125,6 +125,14 @@ struct LessonListView: View {
         .background(TopGlow(color: DP.blue.opacity(0.5), reach: 0.35))
         .fullScreenCover(item: $playing) { c in LessonReelView(course: c).environmentObject(game) }
         .sheet(isPresented: $showLiked) { LikedCardsView().environmentObject(game) }
+        #if DEBUG
+        .onAppear {
+            let d = UserDefaults.standard
+            if d.bool(forKey: "debugWorry") { game.worry = "ねむれない" }
+            if d.bool(forKey: "debugReel") { playing = Courses.all[0] }
+            if d.bool(forKey: "debugLiked") { game.likedCards = ["0-0", "0-2", "1-0"]; showLiked = true }
+        }
+        #endif
     }
 
     private var recommendBadge: some View {

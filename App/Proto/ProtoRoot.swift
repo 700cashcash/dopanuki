@@ -69,6 +69,14 @@ struct ProtoRoot: View {
             if d.bool(forKey: "debugPick") && game.flow == nil { game.flow = .pick }
             if d.bool(forKey: "debugBase") && game.flow == nil { game.start(SessionPlan(title: "25分", goalMinutes: 25)) }
             if d.bool(forKey: "debugNight") { game.nightToast = 7 * 60 }
+            if d.bool(forKey: "debugPeek") && game.flow == nil {
+                game.start(SessionPlan(title: "25分", goalMinutes: 25, lives: 3, peekMinutes: 5, useBase: false))
+                game.demoBoost = 8 * 60 + 21
+                game.peek()
+            }
+            if d.bool(forKey: "debugResult") {
+                game.flow = .result(SessionResult(minutes: 42, bones: 1, stars: 76, multiplier: 1.5, baseBonus: true))
+            }
             if d.bool(forKey: "debugRun") && game.flow == nil {
                 game.start(SessionPlan(title: "25分", goalMinutes: 25, lives: 2, peekMinutes: 5)); game.begin(atBase: true)
             }
