@@ -1,0 +1,137 @@
+# XcodeGen 設定ファイル: `xcodegen generate` で SNSLimiter.xcodeproj を生成します
+name: SNSLimiter
+options:
+  bundleIdPrefix: com.isk.dopanuki   # ← 自分のIDに変更(拡張は このID.ターゲット名 になる)
+  deploymentTarget:
+    iOS: "16.0"
+settings:
+  base:
+    DEVELOPMENT_TEAM: Q9V335WHYV          # Soichiro Ishiko (Individual)
+    SWIFT_VERSION: "5.9"
+targets:
+  SNSLimiter:
+    type: application
+    platform: iOS
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.isk.dopanuki   # 拡張のIDはこれで始まる必要あり
+    sources:
+      - path: App
+        excludes: [InfoDemo.plist, SNSLimiterDemo.entitlements]
+      - Shared
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: ドパ抜き
+        UILaunchScreen: {}
+        NSMotionUsageDescription: 歩いた歩数でほねがもらえるよ
+        NSMicrophoneUsageDescription: ドパ抜きちゃんとおしゃべりするのに使うよ
+        ITSAppUsesNonExemptEncryption: false
+    entitlements:
+      path: App/SNSLimiter.entitlements
+      properties:
+        com.apple.developer.family-controls: true
+        com.apple.security.application-groups: [group.com.isk.dopanuki]
+    dependencies:
+      - target: MonitorExtension
+      - target: ShieldExtension
+      - target: ContentBlocker
+      - target: ReportExtension
+  # TestFlight で友達に配るデモ版（スクリーンタイムのブロックなし・拡張なし。バンドルIDは本体と同じ）
+  SNSLimiterDemo:
+    type: application
+    platform: iOS
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.isk.dopanuki
+        PRODUCT_NAME: SNSLimiter
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: $(inherited) DEMO
+    sources:
+      - path: App
+        excludes: [Info.plist, SNSLimiter.entitlements]
+      - Shared
+    info:
+      path: App/InfoDemo.plist
+      properties:
+        CFBundleDisplayName: ドパ抜き
+        UILaunchScreen: {}
+        NSMotionUsageDescription: 歩いた歩数でほねがもらえるよ
+        NSMicrophoneUsageDescription: ドパ抜きちゃんとおしゃべりするのに使うよ
+        ITSAppUsesNonExemptEncryption: false
+    entitlements:
+      path: App/SNSLimiterDemo.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.isk.dopanuki]
+  MonitorExtension:
+    type: app-extension
+    platform: iOS
+    sources: [MonitorExtension, Shared]
+    info:
+      path: MonitorExtension/Info.plist
+      properties:
+        CFBundleDisplayName: ドパ抜き 監視
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.deviceactivity.monitor-extension
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).MonitorExtension
+    entitlements:
+      path: MonitorExtension/MonitorExtension.entitlements
+      properties:
+        com.apple.developer.family-controls: true
+        com.apple.security.application-groups: [group.com.isk.dopanuki]
+  ShieldExtension:
+    type: app-extension
+    platform: iOS
+    sources: [ShieldExtension, Shared/DetoxTips.swift]
+    info:
+      path: ShieldExtension/Info.plist
+      properties:
+        CFBundleDisplayName: ドパ抜き ブロック画面
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.ManagedSettingsUI.shield-configuration-service
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShieldExtension
+    entitlements:
+      path: ShieldExtension/ShieldExtension.entitlements
+      properties:
+        com.apple.developer.family-controls: true
+  ContentBlocker:
+    type: app-extension
+    platform: iOS
+    sources: [ContentBlocker]
+    info:
+      path: ContentBlocker/Info.plist
+      properties:
+        CFBundleDisplayName: ドパ抜き
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.Safari.content-blocker
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ContentBlockerRequestHandler
+  ReportExtension:
+    type: app-extension
+    platform: iOS
+    sources: [ReportExtension]
+    info:
+      path: ReportExtension/Info.plist
+      properties:
+        CFBundleDisplayName: ドパ抜き レポート
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.deviceactivityui.report-extension
+    entitlements:
+      path: ReportExtension/ReportExtension.entitlements
+      properties:
+        com.apple.developer.family-controls: true
+schemes:
+  SNSLimiter:   # アプリ本体を実行するスキーム(Xcodeで▶を押すときはこれを選ぶ)
+    build:
+      targets:
+        SNSLimiter: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+  SNSLimiterDemo:   # TestFlight（Xcode Cloud）用
+    build:
+      targets:
+        SNSLimiterDemo: all
+    run:
+      config: Debug
+    archive:
+      config: Release

@@ -1,0 +1,69 @@
+[
+  {
+    "trigger": {
+      "url-filter": "^https?://([a-z]+\\.)?youtube\\.com/shorts/",
+      "resource-type": [
+        "document"
+      ]
+    },
+    "action": {
+      "type": "block"
+    }
+  },
+  {
+    "trigger": {
+      "url-filter": "^https?://([a-z]+\\.)?youtube\\.com/youtubei/v1/reel/"
+    },
+    "action": {
+      "type": "block"
+    }
+  },
+  {
+    "trigger": {
+      "url-filter": "^https?://([a-z]+\\.)?youtube\\.com/"
+    },
+    "action": {
+      "type": "css-display-none",
+      "selector": "ytm-reel-shelf-renderer, ytm-shorts-lockup-view-model, ytd-reel-shelf-renderer, ytd-rich-shelf-renderer[is-shorts], a[href^='/shorts/'], ytm-pivot-bar-item-renderer:has(.pivot-shorts), ytd-guide-entry-renderer:has(a[title='Shorts']), ytd-mini-guide-entry-renderer[aria-label='Shorts']"
+    }
+  },
+  {
+    "trigger": {
+      "url-filter": "^https?://([a-z]+\\.)?instagram\\.com/reels?/",
+      "resource-type": [
+        "document"
+      ]
+    },
+    "action": {
+      "type": "block"
+    }
+  },
+  {
+    "trigger": {
+      "url-filter": "^https?://([a-z]+\\.)?instagram\\.com/api/v1/clips/"
+    },
+    "action": {
+      "type": "block"
+    }
+  },
+  {
+    "trigger": {
+      "url-filter": "^https?://([a-z]+\\.)?instagram\\.com/"
+    },
+    "action": {
+      "type": "css-display-none",
+      "selector": "a[href='/reels/'], a[href^='/reels/'], a[href^='/reel/'], div:has(> a[href^='/reel/'])"
+    }
+  },
+  {
+    "trigger": {
+      "url-filter": "^https?://([a-z]+\\.)?tiktok\\.com/",
+      "resource-type": [
+        "document"
+      ]
+    },
+    "action": {
+      "type": "block"
+    }
+  }
+]

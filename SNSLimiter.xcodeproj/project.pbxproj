@@ -1,0 +1,955 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		01545712C1FD06C3190BB2B4 /* NightLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2360B5FDEFE6F0E361C7D3CF /* NightLock.swift */; };
+		03C1B41A570C976DCC9B8132 /* Alternatives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6750FDD212610BEB193BBC28 /* Alternatives.swift */; };
+		071F66D364036EA1F11D6D50 /* Alternatives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6750FDD212610BEB193BBC28 /* Alternatives.swift */; };
+		0896016D946CB84697661FD5 /* ShieldExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A2573CF7125E72BDF1BBD70C /* ShieldExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		12B9023BC45A839C5DCD91E1 /* RoadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E6054DD9AF06F37DC138250 /* RoadView.swift */; };
+		1513391AC6C1E3DF439A5A4A /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF7935B5DDEBA574FEB7439 /* GameState.swift */; };
+		1B8308C174465CC41AD3C330 /* SharedSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAB83050EB68D761E4D7A74 /* SharedSettings.swift */; };
+		29BD64A192F5769A4A0D376A /* SafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44196EC1DB3661E9297D60DE /* SafariView.swift */; };
+		2F1C6389938542B562FDD65B /* LimitScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E4528DD9B7C2E3C2D55174C /* LimitScheduler.swift */; };
+		2F20960B47852D33B626CE6A /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF7935B5DDEBA574FEB7439 /* GameState.swift */; };
+		2F66D1C44F0BFFF7903A1D6F /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3686D3652DFEA9879F1C9454 /* Theme.swift */; };
+		34EF616252B5166E32C0C87C /* ReportExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 87EDA0B15179E03276C09288 /* ReportExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		354E7D5DC36235DCD30F46B6 /* SharedSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAB83050EB68D761E4D7A74 /* SharedSettings.swift */; };
+		3895878EBDB9B23E3BCD31AF /* ContentBlockerRequestHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8193F7F91F9D3BC7E918CFE1 /* ContentBlockerRequestHandler.swift */; };
+		3BBF72CB5C81A80248B83AD4 /* SessionViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33783610A4B0D80EC50B8E60 /* SessionViews.swift */; };
+		3D2AF15317054C41FBA99E0E /* ReportExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7613D43D1A73967B50CBA9EB /* ReportExtension.swift */; };
+		42E973A467D5E8AF3E41AACC /* NightLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2360B5FDEFE6F0E361C7D3CF /* NightLock.swift */; };
+		4BC958AC6F90609F95189D2E /* DetoxTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA7E13E773F5EDE848EB0D1 /* DetoxTips.swift */; };
+		4D72721E0B241F76A2655673 /* DetoxTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA7E13E773F5EDE848EB0D1 /* DetoxTips.swift */; };
+		4D7B55A6BCF1DAC7CFE26DA5 /* SafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44196EC1DB3661E9297D60DE /* SafariView.swift */; };
+		4D998085B246E1B44B592B25 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522E0054F6472A39F618929B /* ContentView.swift */; };
+		4FF1F8320F973025BBF2246F /* DogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E42467DC1D5F56AF3326BF5 /* DogView.swift */; };
+		50D09C71E5DC410F8716E07B /* DogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E42467DC1D5F56AF3326BF5 /* DogView.swift */; };
+		541C3391D363C706D8348327 /* Scenes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F3CEDA732D84417BD4730A /* Scenes.swift */; };
+		54FCD74496FF3098AF542C53 /* SNSLimiterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDE7C3DFD9D1F4C2F228490 /* SNSLimiterApp.swift */; };
+		574E00A65D0C6BF94BC1E2C8 /* LimitScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E4528DD9B7C2E3C2D55174C /* LimitScheduler.swift */; };
+		5E2ECE93B1FD7F7356994309 /* ProtoRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE334CC86DAA427CE9DC00CE /* ProtoRoot.swift */; };
+		62814ED5EA3265B4DB9030CE /* RoadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E6054DD9AF06F37DC138250 /* RoadView.swift */; };
+		6483D55E63B50E53B708B885 /* SharedSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAB83050EB68D761E4D7A74 /* SharedSettings.swift */; };
+		71FFA57AFA4A39E7A2095843 /* RoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA4E7EB7C3369DB69717F84 /* RoomView.swift */; };
+		73F38955B4A50F1C0650709C /* MonitorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E449798AD3D281282B01702E /* MonitorExtension.swift */; };
+		75639C9F6D334B7EE132B4DF /* FriendsGoalsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADD2137EF0DF93E0AAA10332 /* FriendsGoalsViews.swift */; };
+		77C86B99E88752636AB3ADA0 /* LessonViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592CBC84FF2CFC8D2128B505 /* LessonViews.swift */; };
+		78AD446BBBD566D683DF5633 /* LessonViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592CBC84FF2CFC8D2128B505 /* LessonViews.swift */; };
+		79EF39B19B5E22257FCABF93 /* blockerList.json in Resources */ = {isa = PBXBuildFile; fileRef = 8CCEC8F3041A3AED1C195077 /* blockerList.json */; };
+		889C6250FED67E2FC456C0CB /* ShieldExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = D560EB2A640966B2047C0232 /* ShieldExtension.swift */; };
+		915052DDDBAC7F6F0023E6E2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522E0054F6472A39F618929B /* ContentView.swift */; };
+		9B3AD2A9ED22B9342FFAB779 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3686D3652DFEA9879F1C9454 /* Theme.swift */; };
+		AAFAA31778B7C0A72F113CA6 /* MonitorExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2008FBD60DEC239EB1DFF333 /* MonitorExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B400732234E696B58F2C5A45 /* BreathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB01F7BD21820ADFE431CDE8 /* BreathView.swift */; };
+		B7CA48256949CC565F4F2FBE /* Scenes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F3CEDA732D84417BD4730A /* Scenes.swift */; };
+		BA21AEF679EE2B37220F2AAA /* DetoxTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA7E13E773F5EDE848EB0D1 /* DetoxTips.swift */; };
+		C2E03EC39E310B6778C7487F /* GoalExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3525CC70F9C803463039B616 /* GoalExtras.swift */; };
+		C3225DBE67B82C7572B03349 /* FriendsGoalsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADD2137EF0DF93E0AAA10332 /* FriendsGoalsViews.swift */; };
+		CA1EB7638CBD3FB9CFAA6CF0 /* ContentBlocker.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 756EF7C3AF84562967489D78 /* ContentBlocker.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CCCDB1ED1EDD46E4E782D16F /* Talk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F9A76AA93F6D219EEDA9141 /* Talk.swift */; };
+		D2178183F32F3AA67BF4185F /* RoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA4E7EB7C3369DB69717F84 /* RoomView.swift */; };
+		D43DE6809B3775D1EBB9CF55 /* DetoxTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA7E13E773F5EDE848EB0D1 /* DetoxTips.swift */; };
+		D59F109411F671DD4A4FD321 /* BreathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB01F7BD21820ADFE431CDE8 /* BreathView.swift */; };
+		D6C27F0A1716A5CE88213591 /* SessionViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33783610A4B0D80EC50B8E60 /* SessionViews.swift */; };
+		DB5D27745E680E9CB8077561 /* GoalExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3525CC70F9C803463039B616 /* GoalExtras.swift */; };
+		F978BB173B1381BDDCCFC37C /* SNSLimiterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDE7C3DFD9D1F4C2F228490 /* SNSLimiterApp.swift */; };
+		FACCA1665E37CE0E957A00AF /* Talk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F9A76AA93F6D219EEDA9141 /* Talk.swift */; };
+		FB6C9B1CBF059E5C8AF2D968 /* ProtoRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE334CC86DAA427CE9DC00CE /* ProtoRoot.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		12F2EDD77B3F082954083329 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E35615F3D3CEFA7F9C2CE700 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AF917E63628B3350C331FC86;
+			remoteInfo = MonitorExtension;
+		};
+		47A635642B4F5292D12741DE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E35615F3D3CEFA7F9C2CE700 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 172005C783EB5071CA59BDE2;
+			remoteInfo = ContentBlocker;
+		};
+		50CCF4DD25535FB182F5BDEE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E35615F3D3CEFA7F9C2CE700 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 42964C2FBC54805DE291AEDF;
+			remoteInfo = ShieldExtension;
+		};
+		FBB2CDDA17D0756ED0B3A3B4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E35615F3D3CEFA7F9C2CE700 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FDD76E1A4F8198FBF4D4A060;
+			remoteInfo = ReportExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		68FFAC7018EE91D835ECC9E1 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				AAFAA31778B7C0A72F113CA6 /* MonitorExtension.appex in Embed Foundation Extensions */,
+				0896016D946CB84697661FD5 /* ShieldExtension.appex in Embed Foundation Extensions */,
+				CA1EB7638CBD3FB9CFAA6CF0 /* ContentBlocker.appex in Embed Foundation Extensions */,
+				34EF616252B5166E32C0C87C /* ReportExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0CDE7C3DFD9D1F4C2F228490 /* SNSLimiterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SNSLimiterApp.swift; sourceTree = "<group>"; };
+		2008FBD60DEC239EB1DFF333 /* MonitorExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = MonitorExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		20947ADEF2AF2BF61B6DF86E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		21FA95B9F1CBA7248EA3858A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		22B1FFFACD8A69468C7FC0EF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		2360B5FDEFE6F0E361C7D3CF /* NightLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightLock.swift; sourceTree = "<group>"; };
+		33783610A4B0D80EC50B8E60 /* SessionViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionViews.swift; sourceTree = "<group>"; };
+		3525CC70F9C803463039B616 /* GoalExtras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalExtras.swift; sourceTree = "<group>"; };
+		3686D3652DFEA9879F1C9454 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		3B2C5CA61D754E0F1531FFB3 /* SNSLimiterDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SNSLimiterDemo.entitlements; sourceTree = "<group>"; };
+		3E6054DD9AF06F37DC138250 /* RoadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoadView.swift; sourceTree = "<group>"; };
+		3F9A76AA93F6D219EEDA9141 /* Talk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Talk.swift; sourceTree = "<group>"; };
+		44196EC1DB3661E9297D60DE /* SafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariView.swift; sourceTree = "<group>"; };
+		4FA4E7EB7C3369DB69717F84 /* RoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomView.swift; sourceTree = "<group>"; };
+		522E0054F6472A39F618929B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		592CBC84FF2CFC8D2128B505 /* LessonViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonViews.swift; sourceTree = "<group>"; };
+		5DAB83050EB68D761E4D7A74 /* SharedSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedSettings.swift; sourceTree = "<group>"; };
+		5E4528DD9B7C2E3C2D55174C /* LimitScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LimitScheduler.swift; sourceTree = "<group>"; };
+		6750FDD212610BEB193BBC28 /* Alternatives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alternatives.swift; sourceTree = "<group>"; };
+		67530F6550BE95A6319BE06B /* SNSLimiter.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SNSLimiter.entitlements; sourceTree = "<group>"; };
+		756EF7C3AF84562967489D78 /* ContentBlocker.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = ContentBlocker.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		7613D43D1A73967B50CBA9EB /* ReportExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportExtension.swift; sourceTree = "<group>"; };
+		7857C1E93DAE689147A84122 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		7CA8F4EC00D5755FFFA72F0E /* InfoDemo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = InfoDemo.plist; sourceTree = "<group>"; };
+		7FF7935B5DDEBA574FEB7439 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
+		8193F7F91F9D3BC7E918CFE1 /* ContentBlockerRequestHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockerRequestHandler.swift; sourceTree = "<group>"; };
+		87EDA0B15179E03276C09288 /* ReportExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = ReportExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		8CCEC8F3041A3AED1C195077 /* blockerList.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = blockerList.json; sourceTree = "<group>"; };
+		8E42467DC1D5F56AF3326BF5 /* DogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogView.swift; sourceTree = "<group>"; };
+		A2573CF7125E72BDF1BBD70C /* ShieldExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = ShieldExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		ADD2137EF0DF93E0AAA10332 /* FriendsGoalsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsGoalsViews.swift; sourceTree = "<group>"; };
+		B3F3CEDA732D84417BD4730A /* Scenes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scenes.swift; sourceTree = "<group>"; };
+		C2CFCD1A4F56F9A572C43919 /* ReportExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ReportExtension.entitlements; sourceTree = "<group>"; };
+		C5FBEF63F2B7F435DBC07F7C /* ShieldExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShieldExtension.entitlements; sourceTree = "<group>"; };
+		C744D7A2B72F420EBB29B489 /* SNSLimiter.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SNSLimiter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA6064C710543220F26D43F9 /* SNSLimiterDemo.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SNSLimiterDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D560EB2A640966B2047C0232 /* ShieldExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldExtension.swift; sourceTree = "<group>"; };
+		E26F1184C53083C78B48E9DB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		E449798AD3D281282B01702E /* MonitorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitorExtension.swift; sourceTree = "<group>"; };
+		EE334CC86DAA427CE9DC00CE /* ProtoRoot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtoRoot.swift; sourceTree = "<group>"; };
+		EFA7E13E773F5EDE848EB0D1 /* DetoxTips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetoxTips.swift; sourceTree = "<group>"; };
+		F2B6E7F288D88F6A022E4D3F /* MonitorExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MonitorExtension.entitlements; sourceTree = "<group>"; };
+		FB01F7BD21820ADFE431CDE8 /* BreathView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		07CE634BB6B34D40E145C1B0 /* ContentBlocker */ = {
+			isa = PBXGroup;
+			children = (
+				8CCEC8F3041A3AED1C195077 /* blockerList.json */,
+				8193F7F91F9D3BC7E918CFE1 /* ContentBlockerRequestHandler.swift */,
+				20947ADEF2AF2BF61B6DF86E /* Info.plist */,
+			);
+			path = ContentBlocker;
+			sourceTree = "<group>";
+		};
+		138980F47E04A5E0D7A8905F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				756EF7C3AF84562967489D78 /* ContentBlocker.appex */,
+				2008FBD60DEC239EB1DFF333 /* MonitorExtension.appex */,
+				87EDA0B15179E03276C09288 /* ReportExtension.appex */,
+				A2573CF7125E72BDF1BBD70C /* ShieldExtension.appex */,
+				C744D7A2B72F420EBB29B489 /* SNSLimiter.app */,
+				CA6064C710543220F26D43F9 /* SNSLimiterDemo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4657000F004D3515F3F85EAB /* MonitorExtension */ = {
+			isa = PBXGroup;
+			children = (
+				22B1FFFACD8A69468C7FC0EF /* Info.plist */,
+				F2B6E7F288D88F6A022E4D3F /* MonitorExtension.entitlements */,
+				E449798AD3D281282B01702E /* MonitorExtension.swift */,
+			);
+			path = MonitorExtension;
+			sourceTree = "<group>";
+		};
+		6AF29879B2CD7226F5B01D00 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				522E0054F6472A39F618929B /* ContentView.swift */,
+				21FA95B9F1CBA7248EA3858A /* Info.plist */,
+				7CA8F4EC00D5755FFFA72F0E /* InfoDemo.plist */,
+				5E4528DD9B7C2E3C2D55174C /* LimitScheduler.swift */,
+				44196EC1DB3661E9297D60DE /* SafariView.swift */,
+				67530F6550BE95A6319BE06B /* SNSLimiter.entitlements */,
+				0CDE7C3DFD9D1F4C2F228490 /* SNSLimiterApp.swift */,
+				3B2C5CA61D754E0F1531FFB3 /* SNSLimiterDemo.entitlements */,
+				CA1194AAAEDA85D248F5A795 /* Proto */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		AB10169336F70A109D725858 /* ReportExtension */ = {
+			isa = PBXGroup;
+			children = (
+				7857C1E93DAE689147A84122 /* Info.plist */,
+				C2CFCD1A4F56F9A572C43919 /* ReportExtension.entitlements */,
+				7613D43D1A73967B50CBA9EB /* ReportExtension.swift */,
+			);
+			path = ReportExtension;
+			sourceTree = "<group>";
+		};
+		C97533F78F4784537C7D648F /* ShieldExtension */ = {
+			isa = PBXGroup;
+			children = (
+				E26F1184C53083C78B48E9DB /* Info.plist */,
+				C5FBEF63F2B7F435DBC07F7C /* ShieldExtension.entitlements */,
+				D560EB2A640966B2047C0232 /* ShieldExtension.swift */,
+			);
+			path = ShieldExtension;
+			sourceTree = "<group>";
+		};
+		CA1194AAAEDA85D248F5A795 /* Proto */ = {
+			isa = PBXGroup;
+			children = (
+				6750FDD212610BEB193BBC28 /* Alternatives.swift */,
+				FB01F7BD21820ADFE431CDE8 /* BreathView.swift */,
+				8E42467DC1D5F56AF3326BF5 /* DogView.swift */,
+				ADD2137EF0DF93E0AAA10332 /* FriendsGoalsViews.swift */,
+				7FF7935B5DDEBA574FEB7439 /* GameState.swift */,
+				3525CC70F9C803463039B616 /* GoalExtras.swift */,
+				592CBC84FF2CFC8D2128B505 /* LessonViews.swift */,
+				2360B5FDEFE6F0E361C7D3CF /* NightLock.swift */,
+				EE334CC86DAA427CE9DC00CE /* ProtoRoot.swift */,
+				3E6054DD9AF06F37DC138250 /* RoadView.swift */,
+				4FA4E7EB7C3369DB69717F84 /* RoomView.swift */,
+				B3F3CEDA732D84417BD4730A /* Scenes.swift */,
+				33783610A4B0D80EC50B8E60 /* SessionViews.swift */,
+				3F9A76AA93F6D219EEDA9141 /* Talk.swift */,
+				3686D3652DFEA9879F1C9454 /* Theme.swift */,
+			);
+			path = Proto;
+			sourceTree = "<group>";
+		};
+		D5922CAE47AA309A76C9AF5F /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				EFA7E13E773F5EDE848EB0D1 /* DetoxTips.swift */,
+				5DAB83050EB68D761E4D7A74 /* SharedSettings.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		DAFE2F0113F656B429F8A5CC = {
+			isa = PBXGroup;
+			children = (
+				6AF29879B2CD7226F5B01D00 /* App */,
+				07CE634BB6B34D40E145C1B0 /* ContentBlocker */,
+				4657000F004D3515F3F85EAB /* MonitorExtension */,
+				AB10169336F70A109D725858 /* ReportExtension */,
+				D5922CAE47AA309A76C9AF5F /* Shared */,
+				C97533F78F4784537C7D648F /* ShieldExtension */,
+				138980F47E04A5E0D7A8905F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		172005C783EB5071CA59BDE2 /* ContentBlocker */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8F271A162654D9A5903CABE8 /* Build configuration list for PBXNativeTarget "ContentBlocker" */;
+			buildPhases = (
+				87388C85658419B8FC66FB8D /* Sources */,
+				263A72206F2A3445BF3D2798 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ContentBlocker;
+			packageProductDependencies = (
+			);
+			productName = ContentBlocker;
+			productReference = 756EF7C3AF84562967489D78 /* ContentBlocker.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		2893525B167D203869F5327D /* SNSLimiter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B67E5385385EA005EE77B7DE /* Build configuration list for PBXNativeTarget "SNSLimiter" */;
+			buildPhases = (
+				9CEA01D7EC6AC1A60EB23326 /* Sources */,
+				68FFAC7018EE91D835ECC9E1 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0A6F9DFA24640CCF9CEA9414 /* PBXTargetDependency */,
+				0C98A07F205F1B74DC54630D /* PBXTargetDependency */,
+				ACCF508E72F421C328435C63 /* PBXTargetDependency */,
+				6A55559EA32EBF8ACAB4F1B0 /* PBXTargetDependency */,
+			);
+			name = SNSLimiter;
+			packageProductDependencies = (
+			);
+			productName = SNSLimiter;
+			productReference = C744D7A2B72F420EBB29B489 /* SNSLimiter.app */;
+			productType = "com.apple.product-type.application";
+		};
+		42964C2FBC54805DE291AEDF /* ShieldExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E3E1A1354149BE1289845A9B /* Build configuration list for PBXNativeTarget "ShieldExtension" */;
+			buildPhases = (
+				F209B47BFFAB578C0ECA867E /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ShieldExtension;
+			packageProductDependencies = (
+			);
+			productName = ShieldExtension;
+			productReference = A2573CF7125E72BDF1BBD70C /* ShieldExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		AF917E63628B3350C331FC86 /* MonitorExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9E99BAF4B1B5E699C378E585 /* Build configuration list for PBXNativeTarget "MonitorExtension" */;
+			buildPhases = (
+				028C1141EFCAC99BE8433A35 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MonitorExtension;
+			packageProductDependencies = (
+			);
+			productName = MonitorExtension;
+			productReference = 2008FBD60DEC239EB1DFF333 /* MonitorExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		EC531D75CE10FB00E8D5E6CC /* SNSLimiterDemo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 15D3327230963CBB314F41C8 /* Build configuration list for PBXNativeTarget "SNSLimiterDemo" */;
+			buildPhases = (
+				624AC519AC62086C7F7B9DA0 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SNSLimiterDemo;
+			packageProductDependencies = (
+			);
+			productName = SNSLimiterDemo;
+			productReference = CA6064C710543220F26D43F9 /* SNSLimiterDemo.app */;
+			productType = "com.apple.product-type.application";
+		};
+		FDD76E1A4F8198FBF4D4A060 /* ReportExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7F13F316A035B9728A2BF071 /* Build configuration list for PBXNativeTarget "ReportExtension" */;
+			buildPhases = (
+				64C9900F448277984FEC273D /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ReportExtension;
+			packageProductDependencies = (
+			);
+			productName = ReportExtension;
+			productReference = 87EDA0B15179E03276C09288 /* ReportExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E35615F3D3CEFA7F9C2CE700 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					172005C783EB5071CA59BDE2 = {
+						DevelopmentTeam = Q9V335WHYV;
+					};
+					2893525B167D203869F5327D = {
+						DevelopmentTeam = Q9V335WHYV;
+					};
+					42964C2FBC54805DE291AEDF = {
+						DevelopmentTeam = Q9V335WHYV;
+					};
+					AF917E63628B3350C331FC86 = {
+						DevelopmentTeam = Q9V335WHYV;
+					};
+					EC531D75CE10FB00E8D5E6CC = {
+						DevelopmentTeam = Q9V335WHYV;
+					};
+					FDD76E1A4F8198FBF4D4A060 = {
+						DevelopmentTeam = Q9V335WHYV;
+					};
+				};
+			};
+			buildConfigurationList = FE9156DE2EC676D414BE4B67 /* Build configuration list for PBXProject "SNSLimiter" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = DAFE2F0113F656B429F8A5CC;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 138980F47E04A5E0D7A8905F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				2893525B167D203869F5327D /* SNSLimiter */,
+				EC531D75CE10FB00E8D5E6CC /* SNSLimiterDemo */,
+				AF917E63628B3350C331FC86 /* MonitorExtension */,
+				42964C2FBC54805DE291AEDF /* ShieldExtension */,
+				172005C783EB5071CA59BDE2 /* ContentBlocker */,
+				FDD76E1A4F8198FBF4D4A060 /* ReportExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		263A72206F2A3445BF3D2798 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				79EF39B19B5E22257FCABF93 /* blockerList.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		028C1141EFCAC99BE8433A35 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4BC958AC6F90609F95189D2E /* DetoxTips.swift in Sources */,
+				73F38955B4A50F1C0650709C /* MonitorExtension.swift in Sources */,
+				354E7D5DC36235DCD30F46B6 /* SharedSettings.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		624AC519AC62086C7F7B9DA0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				071F66D364036EA1F11D6D50 /* Alternatives.swift in Sources */,
+				B400732234E696B58F2C5A45 /* BreathView.swift in Sources */,
+				4D998085B246E1B44B592B25 /* ContentView.swift in Sources */,
+				BA21AEF679EE2B37220F2AAA /* DetoxTips.swift in Sources */,
+				4FF1F8320F973025BBF2246F /* DogView.swift in Sources */,
+				C3225DBE67B82C7572B03349 /* FriendsGoalsViews.swift in Sources */,
+				2F20960B47852D33B626CE6A /* GameState.swift in Sources */,
+				C2E03EC39E310B6778C7487F /* GoalExtras.swift in Sources */,
+				78AD446BBBD566D683DF5633 /* LessonViews.swift in Sources */,
+				574E00A65D0C6BF94BC1E2C8 /* LimitScheduler.swift in Sources */,
+				42E973A467D5E8AF3E41AACC /* NightLock.swift in Sources */,
+				FB6C9B1CBF059E5C8AF2D968 /* ProtoRoot.swift in Sources */,
+				62814ED5EA3265B4DB9030CE /* RoadView.swift in Sources */,
+				71FFA57AFA4A39E7A2095843 /* RoomView.swift in Sources */,
+				54FCD74496FF3098AF542C53 /* SNSLimiterApp.swift in Sources */,
+				4D7B55A6BCF1DAC7CFE26DA5 /* SafariView.swift in Sources */,
+				541C3391D363C706D8348327 /* Scenes.swift in Sources */,
+				3BBF72CB5C81A80248B83AD4 /* SessionViews.swift in Sources */,
+				6483D55E63B50E53B708B885 /* SharedSettings.swift in Sources */,
+				FACCA1665E37CE0E957A00AF /* Talk.swift in Sources */,
+				2F66D1C44F0BFFF7903A1D6F /* Theme.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		64C9900F448277984FEC273D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3D2AF15317054C41FBA99E0E /* ReportExtension.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		87388C85658419B8FC66FB8D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3895878EBDB9B23E3BCD31AF /* ContentBlockerRequestHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9CEA01D7EC6AC1A60EB23326 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				03C1B41A570C976DCC9B8132 /* Alternatives.swift in Sources */,
+				D59F109411F671DD4A4FD321 /* BreathView.swift in Sources */,
+				915052DDDBAC7F6F0023E6E2 /* ContentView.swift in Sources */,
+				4D72721E0B241F76A2655673 /* DetoxTips.swift in Sources */,
+				50D09C71E5DC410F8716E07B /* DogView.swift in Sources */,
+				75639C9F6D334B7EE132B4DF /* FriendsGoalsViews.swift in Sources */,
+				1513391AC6C1E3DF439A5A4A /* GameState.swift in Sources */,
+				DB5D27745E680E9CB8077561 /* GoalExtras.swift in Sources */,
+				77C86B99E88752636AB3ADA0 /* LessonViews.swift in Sources */,
+				2F1C6389938542B562FDD65B /* LimitScheduler.swift in Sources */,
+				01545712C1FD06C3190BB2B4 /* NightLock.swift in Sources */,
+				5E2ECE93B1FD7F7356994309 /* ProtoRoot.swift in Sources */,
+				12B9023BC45A839C5DCD91E1 /* RoadView.swift in Sources */,
+				D2178183F32F3AA67BF4185F /* RoomView.swift in Sources */,
+				F978BB173B1381BDDCCFC37C /* SNSLimiterApp.swift in Sources */,
+				29BD64A192F5769A4A0D376A /* SafariView.swift in Sources */,
+				B7CA48256949CC565F4F2FBE /* Scenes.swift in Sources */,
+				D6C27F0A1716A5CE88213591 /* SessionViews.swift in Sources */,
+				1B8308C174465CC41AD3C330 /* SharedSettings.swift in Sources */,
+				CCCDB1ED1EDD46E4E782D16F /* Talk.swift in Sources */,
+				9B3AD2A9ED22B9342FFAB779 /* Theme.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F209B47BFFAB578C0ECA867E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D43DE6809B3775D1EBB9CF55 /* DetoxTips.swift in Sources */,
+				889C6250FED67E2FC456C0CB /* ShieldExtension.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		0A6F9DFA24640CCF9CEA9414 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AF917E63628B3350C331FC86 /* MonitorExtension */;
+			targetProxy = 12F2EDD77B3F082954083329 /* PBXContainerItemProxy */;
+		};
+		0C98A07F205F1B74DC54630D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 42964C2FBC54805DE291AEDF /* ShieldExtension */;
+			targetProxy = 50CCF4DD25535FB182F5BDEE /* PBXContainerItemProxy */;
+		};
+		6A55559EA32EBF8ACAB4F1B0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FDD76E1A4F8198FBF4D4A060 /* ReportExtension */;
+			targetProxy = FBB2CDDA17D0756ED0B3A3B4 /* PBXContainerItemProxy */;
+		};
+		ACCF508E72F421C328435C63 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 172005C783EB5071CA59BDE2 /* ContentBlocker */;
+			targetProxy = 47A635642B4F5292D12741DE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0ABA9FC4C0A8F750A9B5D325 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = App/SNSLimiter.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.isk.dopanuki;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		0E734644B7629B89EBE5C044 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ShieldExtension/ShieldExtension.entitlements;
+				INFOPLIST_FILE = ShieldExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.isk.dopanuki.ShieldExtension;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		1EF0FE635E1EAE9EF74E9711 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = App/SNSLimiter.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.isk.dopanuki;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		3813AC9359F880092E7E23CB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ReportExtension/ReportExtension.entitlements;
+				INFOPLIST_FILE = ReportExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.isk.dopanuki.ReportExtension;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4753CC6DDFBDB84C975539BD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = Q9V335WHYV;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		49F5001AC979BF4D2D8E9785 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ReportExtension/ReportExtension.entitlements;
+				INFOPLIST_FILE = ReportExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.isk.dopanuki.ReportExtension;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		5C2458341E192220EF23D2E5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = MonitorExtension/MonitorExtension.entitlements;
+				INFOPLIST_FILE = MonitorExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.isk.dopanuki.MonitorExtension;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		62A1CD7C557EC2F8E1A5A3E1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = ContentBlocker/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.isk.dopanuki.ContentBlocker;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		8057850C1BF255A9F446F593 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = App/SNSLimiterDemo.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = App/InfoDemo.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.isk.dopanuki;
+				PRODUCT_NAME = SNSLimiter;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEMO";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		8CC8A193E4E2C4820F0BA55A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = Q9V335WHYV;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		A510918DF1406E54B068D6C9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = ContentBlocker/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.isk.dopanuki.ContentBlocker;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BE42D64BFFA72496675B71B9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ShieldExtension/ShieldExtension.entitlements;
+				INFOPLIST_FILE = ShieldExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.isk.dopanuki.ShieldExtension;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E0DBC668DEE9951E8D792B15 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = App/SNSLimiterDemo.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = App/InfoDemo.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.isk.dopanuki;
+				PRODUCT_NAME = SNSLimiter;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEMO";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		F806C323DC97DDDDA971B931 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = MonitorExtension/MonitorExtension.entitlements;
+				INFOPLIST_FILE = MonitorExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.isk.dopanuki.MonitorExtension;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		15D3327230963CBB314F41C8 /* Build configuration list for PBXNativeTarget "SNSLimiterDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8057850C1BF255A9F446F593 /* Debug */,
+				E0DBC668DEE9951E8D792B15 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		7F13F316A035B9728A2BF071 /* Build configuration list for PBXNativeTarget "ReportExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3813AC9359F880092E7E23CB /* Debug */,
+				49F5001AC979BF4D2D8E9785 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		8F271A162654D9A5903CABE8 /* Build configuration list for PBXNativeTarget "ContentBlocker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A510918DF1406E54B068D6C9 /* Debug */,
+				62A1CD7C557EC2F8E1A5A3E1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9E99BAF4B1B5E699C378E585 /* Build configuration list for PBXNativeTarget "MonitorExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F806C323DC97DDDDA971B931 /* Debug */,
+				5C2458341E192220EF23D2E5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B67E5385385EA005EE77B7DE /* Build configuration list for PBXNativeTarget "SNSLimiter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0ABA9FC4C0A8F750A9B5D325 /* Debug */,
+				1EF0FE635E1EAE9EF74E9711 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E3E1A1354149BE1289845A9B /* Build configuration list for PBXNativeTarget "ShieldExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BE42D64BFFA72496675B71B9 /* Debug */,
+				0E734644B7629B89EBE5C044 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FE9156DE2EC676D414BE4B67 /* Build configuration list for PBXProject "SNSLimiter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8CC8A193E4E2C4820F0BA55A /* Debug */,
+				4753CC6DDFBDB84C975539BD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E35615F3D3CEFA7F9C2CE700 /* Project object */;
+}
