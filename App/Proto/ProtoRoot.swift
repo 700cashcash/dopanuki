@@ -75,7 +75,13 @@ struct ProtoRoot: View {
                 game.peek()
             }
             if d.bool(forKey: "debugResult") {
-                game.flow = .result(SessionResult(minutes: 42, bones: 1, stars: 76, multiplier: 1.5, baseBonus: true))
+                game.flow = .result(SessionResult(minutes: 42, bones: 1, stars: 76, multiplier: 1.5, baseBonus: true, declared: true))
+            }
+            if d.bool(forKey: "debugDeclare") && game.flow == nil {
+                var p = SessionPlan(title: "3時間", goalMinutes: 180, useBase: false)
+                p.declared = true
+                p.cardWhen = "21:30まで"
+                game.start(p)
             }
             if d.bool(forKey: "debugRun") && game.flow == nil {
                 game.start(SessionPlan(title: "25分", goalMinutes: 25, lives: 2, peekMinutes: 5)); game.begin(atBase: true)

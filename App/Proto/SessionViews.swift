@@ -12,6 +12,8 @@ struct SessionFlowView: View {
                 SessionPickView().transition(.opacity)
             case .base:
                 BaseView().transition(.opacity)
+            case .declare:
+                DeclareView().transition(.opacity)
             case .running:
                 SessionRunView().transition(.move(edge: .bottom).combined(with: .opacity))
             case .result(let r):
@@ -25,30 +27,37 @@ struct SessionFlowView: View {
 
 // MARK: - えらぶ
 
-private struct Option: Identifiable {
-    let id: Int
-    let icon: String
-    let color: Color
-    let title: String
-    let sub: String
-    let reward: String
+/// 長さの単位（分・時間・日・週）
+enum LengthUnit: Int, CaseIterable {
+    case minute, hour, day, week
+    var label: String { ["分", "時間", "日", "週"][rawValue] }
+    var range: ClosedRange<Double> { [5...90, 1...24, 1...6, 1...4][rawValue] }
+    var step: Double { self == .minute ? 5 : 1 }
+    var perUnit: Int { [1, 60, 24 * 60, 7 * 24 * 60][rawValue] }
+    func title(_ v: Int) -> String {
+        switch self {
+        case .minute: return "\(v)分"
+        case .hour: return "\(v)時間"
+        case .day: return "\(v)日間"
+        case .week: return "\(v)週間"
+        }
+    }
 }
 
 struct SessionPickView: View {
     @EnvironmentObject var game: GameState
-    @State private var sel = -1          // -1 = きょうのおすすめ
-    @State private var short: Double = 25   // ちょっとだけ の分数（5〜90）
+    @State private var sel = -1          // -1 = きょうのおすすめ, 0 = 自分で長さをきめる
+    @AppStorage("p.lenUnit") private var unitRaw = 0
+    @AppStorage("p.lenValue") private var value: Double = 25
+    @AppStorage("p.lenCustom") private var lastCustom = false   // 前回「長さをきめる」を選んだか
     @State private var lives = 3
     @State private var peekMin = 5
     @State private var useBase = true
+    @State private var declare = false
     @State private var loaded = false
 
-    private let options = [
-        Option(id: 0, icon: "timer", color: DP.blue, title: "ちょっとだけ", sub: "5〜90分", reward: "+60"),
-        Option(id: 1, icon: "sun.max.fill", color: DP.orange, title: "24時間", sub: "まる1日、SNSお休み", reward: "+400"),
-        Option(id: 2, icon: "flame.fill", color: DP.red, title: "3日", sub: "宣言してはじめる", reward: "+1,000"),
-        Option(id: 3, icon: "crown.fill", color: Color(hex: 0xF2B705), title: "7日", sub: "レア家具がもらえる", reward: "+3,000"),
-    ]
+    private var unit: LengthUnit { LengthUnit(rawValue: unitRaw) ?? .minute }
+    private var goalMinutes: Int { sel == -1 ? minutesUntil8am : Int(value) * unit.perUnit }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -65,40 +74,7 @@ struct SessionPickView: View {
             Button { Haptic.select(); sel = -1 } label: { featured }
                 .buttonStyle(PressStyle(scale: 0.97))
 
-            HStack(spacing: 8) {
-                Chip(label: "ひとりで", on: true)
-                Chip(label: "友達と", on: false).opacity(0.6)
-                Chip(label: "ふせて作業", on: false).opacity(0.6)
-            }
-
-            VStack(spacing: 4) {
-                ForEach(options) { o in
-                    Button { Haptic.select(); sel = o.id } label: { row(o) }
-                        .buttonStyle(PressStyle(scale: 0.97))
-                }
-            }
-
-            if sel == 0 {
-                VStack(spacing: 6) {
-                    HStack(alignment: .firstTextBaseline, spacing: 2) {
-                        Text("\(Int(short))").font(.num(44)).foregroundColor(.white)
-                        Text("分").font(.dp(18, .heavy))
-                        Spacer()
-                        Text(Int(short) <= 10 ? "ミニデトックス" : "+\(Int(short))").font(.num(13)).foregroundColor(DP.yellow)
-                    }
-                    Slider(value: $short, in: 5...90, step: 5)
-                        .tint(DP.blue)
-                        .onChange(of: short) { _ in Haptic.select() }
-                    HStack {
-                        Text("5分").font(.dp(11, .bold)).foregroundColor(DP.dim)
-                        Spacer()
-                        Text("90分").font(.dp(11, .bold)).foregroundColor(DP.dim)
-                    }
-                }
-                .padding(14)
-                .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(DP.card))
-                .transition(.opacity.combined(with: .move(edge: .top)))
-            }
+            lengthPicker
 
             rules
             }
@@ -106,9 +82,17 @@ struct SessionPickView: View {
             }
 
             HStack(spacing: 6) {
-                Text("⭐ ×" + String(format: "%.1f", mult)).font(.num(15))
+                Text("⭐ +\(previewStars.formatted())").font(.num(15)).foregroundColor(DP.yellow)
+                Text("×" + String(format: "%.1f", mult)).font(.num(13))
                     .foregroundColor(mult > 1 ? DP.yellow : .white)
-                Text(useBase ? "基地にずっと置いてたら" : (mult > 1 ? "ライフをしばるほど ⭐ がふえる" : "ふつうの ⭐")).font(.dp(12, .bold)).foregroundColor(DP.gray)
+                if goalMinutes >= 30 {
+                    Text("🦴\(goalMinutes / 30)").font(.num(13))
+                }
+                if let b = badge {
+                    Text(b).font(.dp(11, .heavy)).foregroundColor(.black)
+                        .padding(.horizontal, 8).frame(height: 22)
+                        .background(Capsule().fill(DP.yellow))
+                }
             }
             .frame(maxWidth: .infinity)
             .animation(.spring(), value: mult)
@@ -124,12 +108,67 @@ struct SessionPickView: View {
             lives = game.maxLives
             peekMin = game.peekMinutes
             useBase = game.useBase
+            declare = game.useDeclare
+            sel = lastCustom ? 0 : -1
         }
+        .onChange(of: sel) { v in lastCustom = v == 0 }
         .padding(.horizontal, 20)
         .padding(.top, 8)
         .padding(.bottom, 16)
         .background(TopGlow(color: DP.navy, reach: 0.4))
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: sel)
+    }
+
+    /// ⭐ のめやす（ゴールまで置けたら）
+    private var previewStars: Int { Int((Double(goalMinutes) * mult).rounded()) }
+    private var badge: String? {
+        if goalMinutes >= 7 * 24 * 60 { return "レア家具" }
+        if goalMinutes >= 3 * 24 * 60 { return "ガチャ+1" }
+        return nil
+    }
+
+    /// 単位（分・時間・日・週）＋スライダー
+    private var lengthPicker: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 6) {
+                ForEach(LengthUnit.allCases, id: \.rawValue) { u in
+                    Button {
+                        Haptic.select()
+                        sel = 0
+                        unitRaw = u.rawValue
+                        value = min(max(value, u.range.lowerBound), u.range.upperBound)
+                        if u == .minute { value = max(5, (value / 5).rounded() * 5) }
+                    } label: { Chip(label: u.label, on: sel == 0 && unit == u).fixedSize() }
+                    .buttonStyle(PressStyle())
+                }
+                Spacer(minLength: 0)
+                Button {
+                    Haptic.success()
+                    sel = 0; unitRaw = LengthUnit.week.rawValue; value = 1
+                } label: { Label("1週間", systemImage: "crown.fill").font(.dp(13, .heavy)).lineLimit(1).fixedSize() }
+                    .buttonStyle(PuffyStyle(color: .yellow, height: 36, fullWidth: false))
+            }
+            HStack(alignment: .firstTextBaseline, spacing: 2) {
+                Text("\(Int(value))").font(.num(48)).foregroundColor(sel == 0 ? .white : DP.dim)
+                Text(unit == .week ? "週間" : unit.label).font(.dp(20, .heavy))
+                    .foregroundColor(sel == 0 ? .white : DP.dim)
+                Spacer()
+                if sel == 0 && unit == .minute && value <= 10 {
+                    Text("ミニデトックス").font(.dp(12, .heavy)).foregroundColor(DP.yellow)
+                }
+            }
+            Slider(value: Binding(get: { value }, set: { value = $0; sel = 0 }), in: unit.range, step: unit.step)
+                .tint(DP.blue)
+                .onChange(of: value) { _ in Haptic.select() }
+            HStack {
+                Text(unit.title(Int(unit.range.lowerBound))).font(.dp(11, .bold)).foregroundColor(DP.dim)
+                Spacer()
+                Text(unit.title(Int(unit.range.upperBound))).font(.dp(11, .bold)).foregroundColor(DP.dim)
+            }
+        }
+        .padding(14)
+        .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(DP.card))
+        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Color.white, lineWidth: sel == 0 ? 2 : 0))
     }
 
     static let peekSteps = [1, 3, 5, 10, 15, 20, 30, 45, 60]
@@ -138,17 +177,28 @@ struct SessionPickView: View {
 
     private var plan: SessionPlan {
         var p: SessionPlan
-        switch sel {
-        case 0: p = SessionPlan(title: "\(Int(short))分", goalMinutes: Int(short))
-        case 1: p = SessionPlan(title: "24時間", goalMinutes: 24 * 60)
-        case 2: p = SessionPlan(title: "3日", goalMinutes: 3 * 24 * 60)
-        case 3: p = SessionPlan(title: "7日", goalMinutes: 7 * 24 * 60)
-        default: p = SessionPlan(title: "あしたの朝まで", goalMinutes: minutesUntil8am)
+        if sel == -1 {
+            p = SessionPlan(title: "あしたの朝まで", goalMinutes: minutesUntil8am)
+            p.cardWhen = "あしたの朝まで"
+        } else {
+            p = SessionPlan(title: unit.title(Int(value)), goalMinutes: goalMinutes)
+            p.cardWhen = Self.whenText(minutes: goalMinutes, unit: unit, value: Int(value))
         }
         p.lives = lives
         p.peekMinutes = peekMin
         p.useBase = useBase
+        p.declared = declare
         return p
+    }
+
+    /// 宣言カードの「いつまで」
+    static func whenText(minutes: Int, unit: LengthUnit, value: Int) -> String {
+        if unit == .day || unit == .week { return unit.title(value) }
+        let end = Date().addingTimeInterval(Double(minutes * 60))
+        let f = DateFormatter()
+        f.dateFormat = "H:mm"
+        let prefix = Calendar.current.isDateInToday(end) ? "" : "あした"
+        return prefix + f.string(from: end) + "まで"
     }
 
     /// 基地スタート／基地なし、ライフ（0〜3）、1回の中断の分数
@@ -170,6 +220,19 @@ struct SessionPickView: View {
                     .buttonStyle(PressStyle())
                 Spacer(minLength: 0)
             }
+            Button { Haptic.select(); declare.toggle() } label: {
+                HStack(spacing: 5) {
+                    Image(systemName: declare ? "megaphone.fill" : "megaphone").font(.system(size: 12, weight: .bold))
+                    Text("宣言してはじめる").font(.dp(13, .bold))
+                    if declare { Image(systemName: "checkmark").font(.system(size: 11, weight: .heavy)) }
+                }
+                .foregroundColor(declare ? .black : .white)
+                .padding(.horizontal, 14).frame(height: 34)
+                .background(Capsule().fill(declare ? DP.yellow : DP.card2))
+            }
+            .buttonStyle(PressStyle())
+            .accessibilityLabel(Text("宣言してはじめる"))
+            .accessibilityValue(Text(declare ? "オン" : "オフ"))
             HStack(spacing: 8) {
                 Text("ライフ").font(.dp(13, .heavy))
                 Spacer()
@@ -244,25 +307,6 @@ struct SessionPickView: View {
         .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(Color.white, lineWidth: sel == -1 ? 3 : 0))
     }
 
-    private func row(_ o: Option) -> some View {
-        HStack(spacing: 14) {
-            Image(systemName: o.icon)
-                .font(.system(size: 22, weight: .bold))
-                .foregroundColor(.white)
-                .frame(width: 52, height: 52)
-                .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(o.color))
-                .shadow(color: o.color.opacity(0.6), radius: 8, y: 4)
-            VStack(alignment: .leading, spacing: 3) {
-                Text(o.title).font(.dp(15, sel == o.id ? .heavy : .semibold))
-                    .foregroundColor(sel == o.id ? DP.blue : .white)
-                Text(o.sub).font(.dp(12, .medium)).foregroundColor(DP.gray)
-            }
-            Spacer()
-            Text(o.reward).font(.num(13)).foregroundColor(DP.yellow)
-        }
-        .frame(height: 60)
-        .contentShape(Rectangle())
-    }
 }
 
 // MARK: - 基地に置く
@@ -610,15 +654,38 @@ struct ResultView: View {
                         .background(Capsule().fill(DP.yellow))
                     reward("circle.hexagongrid.fill", "+\(result.bones)")
                     reward("star.fill", "+\(result.stars)")
-                    if result.baseBonus {
-                        Text("基地ボーナス ×1.2").font(.dp(12, .heavy)).foregroundColor(DP.yellow)
-                    }
-                    if result.multiplier > 1 {
-                        Text("×" + String(format: "%.1f", result.multiplier)).font(.num(15)).foregroundColor(DP.yellow)
+                    if result.multiplier > 1 || result.baseBonus {
+                        Text("×" + String(format: "%.1f", result.multiplier * (result.baseBonus ? 1.2 : 1)))
+                            .font(.num(15)).foregroundColor(DP.yellow)
+                            .fixedSize()
                     }
                 }
                 .opacity(appear ? 1 : 0)
                 .offset(y: appear ? 0 : 20)
+                if result.baseBonus {
+                    Label("基地ボーナス ×1.2", systemImage: "bolt.fill").font(.dp(12, .heavy)).foregroundColor(DP.yellow)
+                        .opacity(appear ? 1 : 0)
+                }
+
+                if result.declared {
+                    let card = ClearCard(name: game.userName.isEmpty ? "わたし" : game.userName, minutes: result.minutes)
+                    HStack(spacing: 12) {
+                        card.scaleEffect(0.3).frame(width: 96, height: 120)
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("宣言どおりクリア！").font(.dp(15, .heavy))
+                            Text("\(result.minutes)分 取り戻した").font(.dp(13, .bold)).foregroundColor(DP.gray)
+                            ShareLink(item: renderCard(card),
+                                      message: Text("宣言どおりクリア！ \(result.minutes)分 取り戻した #ドパ抜きチャレンジ"),
+                                      preview: SharePreview("ドパ抜き クリア", image: renderCard(card))) {
+                                Label("カードをシェア", systemImage: "square.and.arrow.up").font(.dp(13, .heavy))
+                            }
+                            .buttonStyle(PuffyStyle(color: .green, height: 36, fullWidth: false, strong: false))
+                        }
+                        Spacer(minLength: 0)
+                    }
+                    .padding(12)
+                    .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Color.white.opacity(0.08)))
+                }
 
                 if let t = game.trialGoal {
                     VStack(alignment: .leading, spacing: 8) {
@@ -669,6 +736,7 @@ struct ResultView: View {
             Image(systemName: icon).foregroundColor(icon == "star.fill" ? DP.yellow : .white)
             Text(text).font(.num(16))
         }
+        .fixedSize()
         .padding(.horizontal, 12).frame(height: 30)
         .background(Capsule().fill(Color.white.opacity(0.12)))
     }

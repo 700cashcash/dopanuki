@@ -29,6 +29,8 @@ struct SessionPlan: Equatable {
     var lives: Int = 3        // 0〜3
     var peekMinutes: Int = 5  // 1回の中断の分数（1〜60）
     var useBase = true        // 基地スタート（充電器に置いてから はじめる）
+    var declared = false      // 宣言してはじめる
+    var cardWhen = ""         // 宣言カードの「いつまで」（例：21:30まで／あしたの朝まで／3日間）
 }
 
 /// ライフが少ないほど、ちょっとだけタイムが短いほど ⭐ がふえる
@@ -51,11 +53,13 @@ struct SessionResult: Equatable {
     var stars: Int
     var multiplier: Double = 1
     var baseBonus = false
+    var declared = false
 }
 
 enum SessionFlow: Equatable {
     case pick
     case base        // スマホ基地に置く
+    case declare     // 宣言カード
     case running
     case result(SessionResult)
 }
@@ -97,6 +101,11 @@ final class GameState: ObservableObject {
     @Published var pendingPlan: SessionPlan?
     @Published var atBase: Bool { didSet { Self.ud.set(atBase, forKey: "p.atBase") } }
     @Published var useBase: Bool { didSet { Self.ud.set(useBase, forKey: "p.useBase") } }
+    /// 宣言してはじめる（前回の選択をおぼえる）・宣言カードに出す名前
+    @Published var useDeclare: Bool { didSet { Self.ud.set(useDeclare, forKey: "p.useDeclare") } }
+    @Published var userName: String { didSet { Self.ud.set(userName, forKey: "p.userName") } }
+    @Published var sessionDeclared: Bool { didSet { Self.ud.set(sessionDeclared, forKey: "p.sDeclared") } }
+    private var pendingAtBase = false
     /// いいねしたレッスンカード（"コースID-問題番号"）
     @Published var likedCards: [String] { didSet { Self.ud.set(likedCards, forKey: "p.liked") } }
     /// 深呼吸した合計分数（ごほうびの道）
@@ -150,6 +159,9 @@ final class GameState: ObservableObject {
         worry = d.string(forKey: "p.worry") ?? ""
         atBase = d.bool(forKey: "p.atBase")
         useBase = d.object(forKey: "p.useBase") as? Bool ?? true
+        useDeclare = d.bool(forKey: "p.useDeclare")
+        userName = d.string(forKey: "p.userName") ?? "わたし"
+        sessionDeclared = d.bool(forKey: "p.sDeclared")
         likedCards = d.stringArray(forKey: "p.liked") ?? []
         breathMinutes = d.integer(forKey: "p.breathMin")
         bgm = d.string(forKey: "p.bgm") ?? "none"
@@ -209,6 +221,7 @@ final class GameState: ObservableObject {
     func start(_ plan: SessionPlan) {
         pendingPlan = plan
         useBase = plan.useBase
+        useDeclare = plan.declared
         if plan.useBase { flow = .base } else { begin(atBase: false) }
     }
 
@@ -224,6 +237,13 @@ final class GameState: ObservableObject {
     /// 基地に置けた（または基地なし）で、ほんとうにはじめる
     func begin(atBase: Bool) {
         guard let plan = pendingPlan else { return }
+        // 宣言するなら、先に宣言カード
+        if plan.declared && flow != .declare {
+            pendingAtBase = atBase
+            flow = .declare
+            return
+        }
+        sessionDeclared = plan.declared
         pendingPlan = nil
         self.atBase = atBase
         sessionTitle = plan.title
@@ -252,6 +272,8 @@ final class GameState: ObservableObject {
         SessionShield.off()
         rollDay()
         let gotBones = minutes / 30
+        let declaredNow = sessionDeclared
+        sessionDeclared = false
         let mult = rewardMultiplier(lives: maxLives, peekMinutes: peekMinutes)
         let battery = UIDevice.current.batteryState
         let bonus = atBase && (battery == .charging || battery == .full)
@@ -268,7 +290,7 @@ final class GameState: ObservableObject {
             lastSessionDay = today
         }
         Haptic.success()
-        flow = .result(SessionResult(minutes: minutes, bones: gotBones, stars: gotStars, multiplier: mult, baseBonus: bonus))
+        flow = .result(SessionResult(minutes: minutes, bones: gotBones, stars: gotStars, multiplier: mult, baseBonus: bonus, declared: declaredNow))
     }
 
     /// 中断する：ライフを1つ使って、決めた分数だけブロックを止める
@@ -337,6 +359,9 @@ final class GameState: ObservableObject {
         g.fav = true
         goals.insert(g, at: 0)
     }
+
+    /// 宣言カードのあとで はじめる
+    func beginDeclared() { begin(atBase: pendingAtBase) }
 
     func cancelPick() { flow = nil; pendingPlan = nil; trialGoal = nil }
     func closeResult() { flow = nil; trialGoal = nil }

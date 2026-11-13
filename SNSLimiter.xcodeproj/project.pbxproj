@@ -11,6 +11,7 @@
 		03C1B41A570C976DCC9B8132 /* Alternatives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6750FDD212610BEB193BBC28 /* Alternatives.swift */; };
 		071F66D364036EA1F11D6D50 /* Alternatives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6750FDD212610BEB193BBC28 /* Alternatives.swift */; };
 		0896016D946CB84697661FD5 /* ShieldExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A2573CF7125E72BDF1BBD70C /* ShieldExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		093C11A0CB2C042350D40104 /* Declare.swift in Sources */ = {isa = PBXBuildFile; fileRef = A39C130ABBA286C99DFB230F /* Declare.swift */; };
 		12B9023BC45A839C5DCD91E1 /* RoadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E6054DD9AF06F37DC138250 /* RoadView.swift */; };
 		1513391AC6C1E3DF439A5A4A /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF7935B5DDEBA574FEB7439 /* GameState.swift */; };
 		1B8308C174465CC41AD3C330 /* SharedSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAB83050EB68D761E4D7A74 /* SharedSettings.swift */; };
@@ -18,6 +19,7 @@
 		2F1C6389938542B562FDD65B /* LimitScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E4528DD9B7C2E3C2D55174C /* LimitScheduler.swift */; };
 		2F20960B47852D33B626CE6A /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF7935B5DDEBA574FEB7439 /* GameState.swift */; };
 		2F66D1C44F0BFFF7903A1D6F /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3686D3652DFEA9879F1C9454 /* Theme.swift */; };
+		334D110DD15B6BBF0D344F88 /* Declare.swift in Sources */ = {isa = PBXBuildFile; fileRef = A39C130ABBA286C99DFB230F /* Declare.swift */; };
 		34EF616252B5166E32C0C87C /* ReportExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 87EDA0B15179E03276C09288 /* ReportExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		354E7D5DC36235DCD30F46B6 /* SharedSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAB83050EB68D761E4D7A74 /* SharedSettings.swift */; };
 		3895878EBDB9B23E3BCD31AF /* ContentBlockerRequestHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8193F7F91F9D3BC7E918CFE1 /* ContentBlockerRequestHandler.swift */; };
@@ -142,6 +144,7 @@
 		8CCEC8F3041A3AED1C195077 /* blockerList.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = blockerList.json; sourceTree = "<group>"; };
 		8E42467DC1D5F56AF3326BF5 /* DogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogView.swift; sourceTree = "<group>"; };
 		A2573CF7125E72BDF1BBD70C /* ShieldExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = ShieldExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		A39C130ABBA286C99DFB230F /* Declare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Declare.swift; sourceTree = "<group>"; };
 		ADD2137EF0DF93E0AAA10332 /* FriendsGoalsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsGoalsViews.swift; sourceTree = "<group>"; };
 		B3F3CEDA732D84417BD4730A /* Scenes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scenes.swift; sourceTree = "<group>"; };
 		C2CFCD1A4F56F9A572C43919 /* ReportExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ReportExtension.entitlements; sourceTree = "<group>"; };
@@ -232,6 +235,7 @@
 			children = (
 				6750FDD212610BEB193BBC28 /* Alternatives.swift */,
 				FB01F7BD21820ADFE431CDE8 /* BreathView.swift */,
+				A39C130ABBA286C99DFB230F /* Declare.swift */,
 				8E42467DC1D5F56AF3326BF5 /* DogView.swift */,
 				ADD2137EF0DF93E0AAA10332 /* FriendsGoalsViews.swift */,
 				7FF7935B5DDEBA574FEB7439 /* GameState.swift */,
@@ -464,6 +468,7 @@
 				071F66D364036EA1F11D6D50 /* Alternatives.swift in Sources */,
 				B400732234E696B58F2C5A45 /* BreathView.swift in Sources */,
 				4D998085B246E1B44B592B25 /* ContentView.swift in Sources */,
+				093C11A0CB2C042350D40104 /* Declare.swift in Sources */,
 				BA21AEF679EE2B37220F2AAA /* DetoxTips.swift in Sources */,
 				4FF1F8320F973025BBF2246F /* DogView.swift in Sources */,
 				C3225DBE67B82C7572B03349 /* FriendsGoalsViews.swift in Sources */,
@@ -508,6 +513,7 @@
 				03C1B41A570C976DCC9B8132 /* Alternatives.swift in Sources */,
 				D59F109411F671DD4A4FD321 /* BreathView.swift in Sources */,
 				915052DDDBAC7F6F0023E6E2 /* ContentView.swift in Sources */,
+				334D110DD15B6BBF0D344F88 /* Declare.swift in Sources */,
 				4D72721E0B241F76A2655673 /* DetoxTips.swift in Sources */,
 				50D09C71E5DC410F8716E07B /* DogView.swift in Sources */,
 				75639C9F6D334B7EE132B4DF /* FriendsGoalsViews.swift in Sources */,
