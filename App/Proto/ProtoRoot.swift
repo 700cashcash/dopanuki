@@ -59,7 +59,14 @@ struct ProtoRoot: View {
             SessionFlowView().environmentObject(game)
         }
         .onChange(of: scenePhase) { phase in
-            if phase == .active { game.checkNight() }
+            if phase == .active { game.checkNight(); game.clock = Date() }
+        }
+        .onReceive(Timer.publish(every: 30, on: .main, in: .common).autoconnect()) { game.clock = $0 }
+        // おやすみロック：夜は基地に置くまで すすめない
+        .overlay {
+            if game.needsNightBase {
+                NightBaseView().environmentObject(game).transition(.opacity)
+            }
         }
         #if DEBUG
         // スクショ確認用: -debugTab 0〜4 / -debugPick YES
@@ -68,11 +75,12 @@ struct ProtoRoot: View {
             if d.object(forKey: "debugTab") != nil, let tt = DPTab(rawValue: d.integer(forKey: "debugTab")) { tab = tt }
             if d.bool(forKey: "debugPick") && game.flow == nil { game.flow = .pick }
             if d.bool(forKey: "debugBase") && game.flow == nil { game.start(SessionPlan(title: "25分", goalMinutes: 25)) }
-            if d.bool(forKey: "debugNight") { game.nightToast = 7 * 60 }
+            if d.bool(forKey: "debugNight") { game.nightToast = "おはよう！ねてる間に7時間取り戻したよ" }
+            if d.bool(forKey: "debugNoNightBase") { game.nightBaseSkipped = true }
             if d.bool(forKey: "debugPeek") && game.flow == nil {
                 game.start(SessionPlan(title: "25分", goalMinutes: 25, lives: 3, peekMinutes: 5, useBase: false))
-                game.demoBoost = 8 * 60 + 21
-                game.peek()
+                game.demoBoost = 8 * 60 + 21; game.lives = 3
+                game.peek(minutes: 10, reason: "LINEの返信")
             }
             if d.bool(forKey: "debugResult") {
                 game.flow = .result(SessionResult(minutes: 42, bones: 1, stars: 76, multiplier: 1.5, baseBonus: true, declared: true))

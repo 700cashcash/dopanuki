@@ -61,7 +61,7 @@ struct RoomView: View {
             .padding(.bottom, 24)
         }
         .background(TopGlow(color: roomTint.opacity(0.55), reach: 0.4))
-        .sheet(isPresented: $showSettings) { ContentView() }
+        .sheet(isPresented: $showSettings) { BlockSettingsView() }
         .sheet(isPresented: $showGacha) { GachaView().environmentObject(game) }
         .sheet(isPresented: $showNight) { NightLockSheet() }
         .overlay(alignment: .top) { nightToast }
@@ -221,6 +221,7 @@ struct RoomView: View {
             let sheet = UserDefaults.standard.string(forKey: "debugSheet")
             if sheet == "gacha" { showGacha = true }
             if sheet == "night" { showNight = true }
+            if sheet == "settings" { showSettings = true }
             guard let act = UserDefaults.standard.string(forKey: "debugAct") else { return }
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 switch act {
@@ -275,7 +276,7 @@ struct RoomView: View {
         if let m = game.nightToast {
             HStack(spacing: 10) {
                 DogView(size: 44, mood: .happy)
-                Text("おはよう！ねてる間に\(m / 60)時間取り戻したよ").font(.dp(14, .heavy))
+                Text(m).font(.dp(14, .heavy))
                     .fixedSize(horizontal: false, vertical: true)
             }
             .padding(.horizontal, 14).padding(.vertical, 10)
@@ -295,7 +296,7 @@ struct RoomView: View {
     // MARK: タイル
 
     private var tiles: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 8) {
             tile("sparkles", DP.yellow, "ガチャ", "ほね\(game.bones)こ") { showGacha = true }
             tile("person.3.fill", DP.green, "ひろば", "3人が置いてる") { tab = .friends }
             tile("moon.fill", DP.violet, "おやすみ", nightTileText) { showNight = true }
@@ -312,11 +313,13 @@ struct RoomView: View {
                     .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(color))
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title).font(.dp(14, .heavy)).foregroundColor(.white)
-                    Text(sub).font(.dp(11, .semibold)).foregroundColor(DP.gray).lineLimit(1)
+                        .lineLimit(1).minimumScaleFactor(0.8)
+                    Text(sub).font(.dp(11, .semibold)).foregroundColor(DP.gray)
+                        .lineLimit(1).minimumScaleFactor(0.75)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(12)
+            .padding(10)
             .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(DP.card))
         }
         .buttonStyle(PressStyle())

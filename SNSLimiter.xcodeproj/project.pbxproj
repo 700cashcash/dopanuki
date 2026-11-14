@@ -25,6 +25,7 @@
 		3895878EBDB9B23E3BCD31AF /* ContentBlockerRequestHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8193F7F91F9D3BC7E918CFE1 /* ContentBlockerRequestHandler.swift */; };
 		3BBF72CB5C81A80248B83AD4 /* SessionViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33783610A4B0D80EC50B8E60 /* SessionViews.swift */; };
 		3D2AF15317054C41FBA99E0E /* ReportExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7613D43D1A73967B50CBA9EB /* ReportExtension.swift */; };
+		41C85CD003CE11379D15CC7D /* BlockSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00F101FD663F18CC3505441 /* BlockSettings.swift */; };
 		42E973A467D5E8AF3E41AACC /* NightLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2360B5FDEFE6F0E361C7D3CF /* NightLock.swift */; };
 		4BC958AC6F90609F95189D2E /* DetoxTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA7E13E773F5EDE848EB0D1 /* DetoxTips.swift */; };
 		4D72721E0B241F76A2655673 /* DetoxTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA7E13E773F5EDE848EB0D1 /* DetoxTips.swift */; };
@@ -47,6 +48,7 @@
 		889C6250FED67E2FC456C0CB /* ShieldExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = D560EB2A640966B2047C0232 /* ShieldExtension.swift */; };
 		915052DDDBAC7F6F0023E6E2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522E0054F6472A39F618929B /* ContentView.swift */; };
 		9B3AD2A9ED22B9342FFAB779 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3686D3652DFEA9879F1C9454 /* Theme.swift */; };
+		9DD8643FB3DFCA8A67F6667C /* BlockSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00F101FD663F18CC3505441 /* BlockSettings.swift */; };
 		AAFAA31778B7C0A72F113CA6 /* MonitorExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2008FBD60DEC239EB1DFF333 /* MonitorExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		B400732234E696B58F2C5A45 /* BreathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB01F7BD21820ADFE431CDE8 /* BreathView.swift */; };
 		B7CA48256949CC565F4F2FBE /* Scenes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F3CEDA732D84417BD4730A /* Scenes.swift */; };
@@ -152,6 +154,7 @@
 		C744D7A2B72F420EBB29B489 /* SNSLimiter.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SNSLimiter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA6064C710543220F26D43F9 /* SNSLimiterDemo.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SNSLimiterDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D560EB2A640966B2047C0232 /* ShieldExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldExtension.swift; sourceTree = "<group>"; };
+		E00F101FD663F18CC3505441 /* BlockSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockSettings.swift; sourceTree = "<group>"; };
 		E26F1184C53083C78B48E9DB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		E449798AD3D281282B01702E /* MonitorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitorExtension.swift; sourceTree = "<group>"; };
 		EE334CC86DAA427CE9DC00CE /* ProtoRoot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtoRoot.swift; sourceTree = "<group>"; };
@@ -234,6 +237,7 @@
 			isa = PBXGroup;
 			children = (
 				6750FDD212610BEB193BBC28 /* Alternatives.swift */,
+				E00F101FD663F18CC3505441 /* BlockSettings.swift */,
 				FB01F7BD21820ADFE431CDE8 /* BreathView.swift */,
 				A39C130ABBA286C99DFB230F /* Declare.swift */,
 				8E42467DC1D5F56AF3326BF5 /* DogView.swift */,
@@ -466,6 +470,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				071F66D364036EA1F11D6D50 /* Alternatives.swift in Sources */,
+				9DD8643FB3DFCA8A67F6667C /* BlockSettings.swift in Sources */,
 				B400732234E696B58F2C5A45 /* BreathView.swift in Sources */,
 				4D998085B246E1B44B592B25 /* ContentView.swift in Sources */,
 				093C11A0CB2C042350D40104 /* Declare.swift in Sources */,
@@ -511,6 +516,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				03C1B41A570C976DCC9B8132 /* Alternatives.swift in Sources */,
+				41C85CD003CE11379D15CC7D /* BlockSettings.swift in Sources */,
 				D59F109411F671DD4A4FD321 /* BreathView.swift in Sources */,
 				915052DDDBAC7F6F0023E6E2 /* ContentView.swift in Sources */,
 				334D110DD15B6BBF0D344F88 /* Declare.swift in Sources */,

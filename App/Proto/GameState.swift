@@ -30,6 +30,7 @@ struct SessionPlan: Equatable {
     var peekMinutes: Int = 5  // 1回の中断の分数（1〜60）
     var useBase = true        // 基地スタート（充電器に置いてから はじめる）
     var declared = false      // 宣言してはじめる
+    var forceBase = false     // 夜（あしたの朝まで）は基地なしを選べない
     var cardWhen = ""         // 宣言カードの「いつまで」（例：21:30まで／あしたの朝まで／3日間）
 }
 
@@ -116,7 +117,20 @@ final class GameState: ObservableObject {
     @Published var trialGoal: String? { didSet { Self.ud.set(trialGoal, forKey: "p.trial") } }
     @Published var bgm: String { didSet { Self.ud.set(bgm, forKey: "p.bgm") } }
     /// けさ、おやすみロックで取り戻した分（トースト用）
-    @Published var nightToast: Int?
+    @Published var nightToast: String?
+    /// いまの中断の用途と、中断の記録（"用途|分|日時"）
+    @Published var peekReason: String { didSet { Self.ud.set(peekReason, forKey: "p.peekReason") } }
+    @Published var peekLog: [String] { didSet { Self.ud.set(peekLog, forKey: "p.peekLog") } }
+    /// 基地に置いた夜（NightLock.nightKey）
+    @Published var nightBaseKey: String { didSet { Self.ud.set(nightBaseKey, forKey: "p.nightBase") } }
+    /// テスト用に夜の基地画面をとじた（DEBUGのみ）
+    @Published var nightBaseSkipped = false
+    @Published var clock = Date()
+
+    /// 夜の「基地に置こう」画面を出すか
+    var needsNightBase: Bool {
+        !nightBaseSkipped && flow == nil && NightLock.isBaseTime(clock) && nightBaseKey != NightLock.nightKey(clock)
+    }
 
     init() {
         let d = UserDefaults.standard
@@ -156,6 +170,9 @@ final class GameState: ObservableObject {
         peekStart = (d.object(forKey: "p.peekStart") as? Double).map { Date(timeIntervalSince1970: $0) }
         maxLives = d.object(forKey: "p.maxLives") as? Int ?? 3
         peekMinutes = d.object(forKey: "p.peekMin") as? Int ?? 5
+        peekReason = d.string(forKey: "p.peekReason") ?? ""
+        peekLog = d.stringArray(forKey: "p.peekLog") ?? []
+        nightBaseKey = d.string(forKey: "p.nightBase") ?? ""
         worry = d.string(forKey: "p.worry") ?? ""
         atBase = d.bool(forKey: "p.atBase")
         useBase = d.object(forKey: "p.useBase") as? Bool ?? true
@@ -274,7 +291,7 @@ final class GameState: ObservableObject {
         let gotBones = minutes / 30
         let declaredNow = sessionDeclared
         sessionDeclared = false
-        let mult = rewardMultiplier(lives: maxLives, peekMinutes: peekMinutes)
+        let mult = rewardMultiplier(lives: maxLives, peekMinutes: 0)
         let battery = UIDevice.current.batteryState
         let bonus = atBase && (battery == .charging || battery == .full)
         let gotStars = Int((Double(minutes) * mult * (bonus ? 1.2 : 1)).rounded())
@@ -293,12 +310,16 @@ final class GameState: ObservableObject {
         flow = .result(SessionResult(minutes: minutes, bones: gotBones, stars: gotStars, multiplier: mult, baseBonus: bonus, declared: declaredNow))
     }
 
-    /// 中断する：ライフを1つ使って、決めた分数だけブロックを止める
-    func peek() {
+    /// 中断する：ライフを1つ使って、そのとき決めた分数だけブロックを止める（用途も記録）
+    func peek(minutes: Int, reason: String) {
         guard lives > 0, peekUntil == nil else { return }
         lives -= 1
+        peekMinutes = minutes
+        peekReason = reason
+        let f = ISO8601DateFormatter()
+        peekLog.append("\(reason)|\(minutes)|\(f.string(from: Date()))")
         peekStart = Date()
-        peekUntil = Date().addingTimeInterval(Double(peekMinutes * 60))
+        peekUntil = Date().addingTimeInterval(Double(minutes * 60))
         SessionShield.off()
         Haptic.medium()
     }
@@ -329,15 +350,21 @@ final class GameState: ObservableObject {
     /// アプリをひらいたとき：夜のロックを登録しなおし、朝なら ゆうべの分を足す
     func checkNight() {
         rollDay()
+        NightLock.migrateFromOldSettings()
         NightLock.apply()
-        guard let m = NightLock.morningCredit() else { return }
+        guard let r = NightLock.morningCredit(baseKey: nightBaseKey) else { return }
+        guard r.counted else {
+            nightToast = "おはよう！こんどは基地でねよ〜"
+            return
+        }
+        let m = r.minutes
         todayMinutes += m
         totalMinutes += m
         weekMinutes += m
         stars += m / 6
         let today = Self.dayKey(Date())
         if lastSessionDay != today { streak += 1; lastSessionDay = today }
-        nightToast = m
+        nightToast = "おはよう！ねてる間に\(m / 60)時間取り戻したよ"
     }
 
     func log(_ key: String) { activity[key, default: 0] += 1 }

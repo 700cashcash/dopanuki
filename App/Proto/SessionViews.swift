@@ -55,6 +55,7 @@ struct SessionPickView: View {
     @State private var useBase = true
     @State private var declare = false
     @State private var loaded = false
+    @State private var showSettings = false
 
     private var unit: LengthUnit { LengthUnit(rawValue: unitRaw) ?? .minute }
     private var goalMinutes: Int { sel == -1 ? minutesUntil8am : Int(value) * unit.perUnit }
@@ -71,6 +72,21 @@ struct SessionPickView: View {
 
             ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 16) {
+            Button { Haptic.select(); declare.toggle() } label: {
+                HStack(spacing: 5) {
+                    Image(systemName: declare ? "megaphone.fill" : "megaphone").font(.system(size: 12, weight: .bold))
+                    Text("宣言してはじめる").font(.dp(13, .bold))
+                    if declare { Image(systemName: "checkmark").font(.system(size: 11, weight: .heavy)) }
+                }
+                .foregroundColor(declare ? .black : .white)
+                .padding(.horizontal, 14).frame(height: 34)
+                .background(Capsule().fill(declare ? DP.yellow : DP.card2))
+            }
+            .buttonStyle(PressStyle())
+            .accessibilityLabel(Text("宣言してはじめる"))
+            .accessibilityValue(Text(declare ? "オン" : "オフ"))
+            .frame(maxWidth: .infinity, alignment: .leading)
+
             Button { Haptic.select(); sel = -1 } label: { featured }
                 .buttonStyle(PressStyle(scale: 0.97))
 
@@ -97,11 +113,21 @@ struct SessionPickView: View {
             .frame(maxWidth: .infinity)
             .animation(.spring(), value: mult)
 
-            Button { game.start(plan) } label: {
-                Label(plan.title + "ではじめる", systemImage: "play.fill")
+            if needsSetup {
+                Button { showSettings = true } label: {
+                    Label("ブロックするアプリを えらぶ", systemImage: "gearshape.fill")
+                }
+                .buttonStyle(PuffyStyle(color: .yellow, height: 60))
+                Text("先に えらんでおくと、セッション中に ちゃんとブロックされるよ")
+                    .font(.dp(12, .bold)).foregroundColor(DP.gray).frame(maxWidth: .infinity)
+            } else {
+                Button { game.start(plan) } label: {
+                    Label(plan.title + "ではじめる", systemImage: "play.fill")
+                }
+                .buttonStyle(PuffyStyle(color: .blue, height: 60))
             }
-            .buttonStyle(PuffyStyle(color: .blue, height: 60))
         }
+        .sheet(isPresented: $showSettings) { BlockSettingsView() }
         .onAppear {
             guard !loaded else { return }
             loaded = true
@@ -117,6 +143,16 @@ struct SessionPickView: View {
         .padding(.bottom, 16)
         .background(TopGlow(color: DP.navy, reach: 0.4))
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: sel)
+    }
+
+    /// ブロックするアプリが まだ決まっていない（デモ版はブロックしないので不要）
+    private var needsSetup: Bool {
+        #if DEMO
+        return false
+        #else
+        _ = showSettings   // シートを閉じたら もう一度しらべる
+        return !(NightLock.isAuthorized && NightLock.hasTargets)
+        #endif
     }
 
     /// ⭐ のめやす（ゴールまで置けたら）
@@ -173,20 +209,21 @@ struct SessionPickView: View {
 
     static let peekSteps = [1, 3, 5, 10, 15, 20, 30, 45, 60]
 
-    private var mult: Double { rewardMultiplier(lives: lives, peekMinutes: peekMin) * (useBase ? 1.2 : 1) }
+    private var mult: Double { rewardMultiplier(lives: lives, peekMinutes: 0) * ((useBase || sel == -1) ? 1.2 : 1) }
 
     private var plan: SessionPlan {
         var p: SessionPlan
         if sel == -1 {
             p = SessionPlan(title: "あしたの朝まで", goalMinutes: minutesUntil8am)
             p.cardWhen = "あしたの朝まで"
+            p.forceBase = true
         } else {
             p = SessionPlan(title: unit.title(Int(value)), goalMinutes: goalMinutes)
             p.cardWhen = Self.whenText(minutes: goalMinutes, unit: unit, value: Int(value))
         }
         p.lives = lives
         p.peekMinutes = peekMin
-        p.useBase = useBase
+        p.useBase = useBase || p.forceBase
         p.declared = declare
         return p
     }
@@ -201,7 +238,7 @@ struct SessionPickView: View {
         return prefix + f.string(from: end) + "まで"
     }
 
-    /// 基地スタート／基地なし、ライフ（0〜3）、1回の中断の分数
+    /// 基地スタート／基地なし、ライフ（0〜3）。中断の分数は中断するときに決める
     private var rules: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
@@ -220,19 +257,6 @@ struct SessionPickView: View {
                     .buttonStyle(PressStyle())
                 Spacer(minLength: 0)
             }
-            Button { Haptic.select(); declare.toggle() } label: {
-                HStack(spacing: 5) {
-                    Image(systemName: declare ? "megaphone.fill" : "megaphone").font(.system(size: 12, weight: .bold))
-                    Text("宣言してはじめる").font(.dp(13, .bold))
-                    if declare { Image(systemName: "checkmark").font(.system(size: 11, weight: .heavy)) }
-                }
-                .foregroundColor(declare ? .black : .white)
-                .padding(.horizontal, 14).frame(height: 34)
-                .background(Capsule().fill(declare ? DP.yellow : DP.card2))
-            }
-            .buttonStyle(PressStyle())
-            .accessibilityLabel(Text("宣言してはじめる"))
-            .accessibilityValue(Text(declare ? "オン" : "オフ"))
             HStack(spacing: 8) {
                 Text("ライフ").font(.dp(13, .heavy))
                 Spacer()
@@ -241,18 +265,6 @@ struct SessionPickView: View {
                         .buttonStyle(PressStyle())
                         .accessibilityLabel(Text("ライフ\(n)"))
                 }
-            }
-            if lives > 0 {
-                HStack {
-                    Text("1回の中断").font(.dp(13, .heavy))
-                    Spacer()
-                    Text("\(peekMin)分").font(.num(20))
-                }
-                Slider(value: Binding(get: { Double(Self.peekSteps.firstIndex(of: peekMin) ?? 2) },
-                                      set: { peekMin = Self.peekSteps[Int($0.rounded())] }),
-                       in: 0...Double(Self.peekSteps.count - 1), step: 1)
-                    .tint(DP.pink)
-                    .onChange(of: peekMin) { _ in Haptic.select() }
             }
         }
         .padding(14)
@@ -307,6 +319,160 @@ struct SessionPickView: View {
         .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(Color.white, lineWidth: sel == -1 ? 3 : 0))
     }
 
+}
+
+// MARK: - 中断する（用途と分数を、そのときに決める）
+
+struct PeekSheet: View {
+    @EnvironmentObject var game: GameState
+    @Environment(\.dismiss) private var dismiss
+    @State private var reason = ""
+    @State private var other = ""
+    @State private var minutes = 5
+    @FocusState private var typing: Bool
+
+    private let reasons = ["💬 LINEの返信", "📞 連絡・電話", "🔍 調べもの", "🗺️ 地図・乗りかえ", "📷 写真", "✏️ その他"]
+    private let lengths = [1, 3, 5, 10, 15, 30, 60]
+
+    /// 記録する用途（えらんだもの or 書いたもの）
+    private var purpose: String {
+        let t = other.trimmingCharacters(in: .whitespaces)
+        if !t.isEmpty { return t }
+        guard !reason.isEmpty, !reason.hasSuffix("その他") else { return "" }
+        return String(reason.split(separator: " ", maxSplits: 1).last ?? "")
+    }
+
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 18) {
+                HStack {
+                    Button { dismiss() } label: { CircleIcon(system: "xmark") }.buttonStyle(PressStyle())
+                    Spacer()
+                    HStack(spacing: 3) {
+                        ForEach(0..<game.lives, id: \.self) { _ in Image(systemName: "heart.fill").foregroundColor(DP.pink) }
+                    }
+                }
+                HStack(spacing: 10) {
+                    DogView(size: 64)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("中断する").font(.dp(26, .heavy))
+                        Text("なにに使うか、きめてからね").font(.dp(13, .bold)).foregroundColor(DP.gray)
+                    }
+                }
+
+                Text("なにに使う？").font(.dp(16, .heavy))
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(0..<3, id: \.self) { r in
+                        HStack(spacing: 8) {
+                            ForEach(reasons[(r * 2)..<(r * 2 + 2)], id: \.self) { item in
+                                Button {
+                                    Haptic.select()
+                                    reason = item
+                                    if item.hasSuffix("その他") { typing = true } else { other = "" }
+                                } label: { Chip(label: item, on: reason == item).fixedSize() }
+                                .buttonStyle(PressStyle())
+                            }
+                        }
+                    }
+                }
+                TextField("ほかに書く", text: $other)
+                    .font(.dp(15, .bold))
+                    .focused($typing)
+                    .padding(.horizontal, 14).frame(height: 44)
+                    .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(DP.card))
+
+                Text("何分？").font(.dp(16, .heavy))
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(lengths, id: \.self) { m in
+                            Button { Haptic.select(); minutes = m } label: { Chip(label: "\(m)分", on: minutes == m).fixedSize() }
+                                .buttonStyle(PressStyle())
+                        }
+                    }
+                }
+                Text("中断のあいだは タイマーが止まるよ").font(.dp(12, .bold)).foregroundColor(DP.dim)
+
+                Button {
+                    game.peek(minutes: minutes, reason: purpose)
+                    dismiss()
+                } label: { Label(purpose.isEmpty ? "なにに使うか えらんでね" : "\(minutes)分 中断する（ライフ−1）", systemImage: "pause.fill") }
+                    .buttonStyle(PuffyStyle(color: .white, height: 56, strong: false))
+                    .disabled(purpose.isEmpty)
+                    .opacity(purpose.isEmpty ? 0.5 : 1)
+                Button("やっぱり つづける") { dismiss() }
+                    .font(.dp(14, .heavy)).foregroundColor(DP.gray)
+                    .frame(maxWidth: .infinity)
+            }
+            .padding(20)
+        }
+        .background(DP.bg.ignoresSafeArea())
+        .preferredColorScheme(.dark)
+    }
+}
+
+// MARK: - おやすみロック：基地に置くまで すすめない
+
+struct NightBaseView: View {
+    @EnvironmentObject var game: GameState
+    @State private var battery = UIDevice.BatteryState.unknown
+    @State private var placed = false
+
+    var body: some View {
+        ZStack {
+            LinearGradient(colors: [Color(hex: 0x10163A), DP.bg], startPoint: .top, endPoint: .bottom).ignoresSafeArea()
+            ForEach(0..<24, id: \.self) { i in
+                Circle().fill(Color.white.opacity(0.5)).frame(width: 2, height: 2)
+                    .position(x: CGFloat((i * 53) % 390), y: CGFloat((i * 97) % 300) + 60)
+            }
+            VStack(spacing: 18) {
+                Text(placed ? "おやすみ！" : "おやすみの前に").font(.dp(30, .heavy))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Spacer(minLength: 0)
+                ZStack {
+                    Circle().fill((placed ? DP.green : DP.violet).opacity(0.25)).frame(width: 260, height: 260).blur(radius: 30)
+                    Image(systemName: placed ? "bolt.fill" : "bolt")
+                        .font(.system(size: 44, weight: .heavy))
+                        .foregroundColor(placed ? DP.yellow : DP.gray)
+                        .frame(width: 80, height: 130)
+                        .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Color(hex: 0x2A2A2A)))
+                        .offset(x: 60)
+                    DogView(size: 140, mood: placed ? .sleep : .normal)
+                        .offset(x: -60, y: 30)
+                        .bob(placed ? 2 : 4, period: placed ? 3 : 2.4)
+                }
+                .frame(height: 280)
+                Bubble(text: placed ? "いっしょに ねよ〜。また あしたね" : "おやすみの前に、基地につないでね")
+                Spacer(minLength: 0)
+                Text(placed ? "朝になったら、ねてた時間が「取り戻した時間」になるよ"
+                            : "充電ケーブルをさすと、すすめるよ。スマホは できるだけ ベッドから遠くに")
+                    .font(.dp(13, .bold)).foregroundColor(DP.gray).multilineTextAlignment(.center)
+                #if DEBUG
+                if battery == .unknown && !placed {
+                    Button("（テスト用）基地なしで とじる") { finish(confirmed: false) }
+                        .font(.dp(12, .bold)).foregroundColor(DP.dim)
+                }
+                #endif
+            }
+            .padding(24)
+        }
+        .preferredColorScheme(.dark)
+        .animation(.spring(response: 0.45, dampingFraction: 0.6), value: placed)
+        .onAppear { UIDevice.current.isBatteryMonitoringEnabled = true; check() }
+        .onReceive(NotificationCenter.default.publisher(for: UIDevice.batteryStateDidChangeNotification)) { _ in check() }
+    }
+
+    private func check() {
+        battery = UIDevice.current.batteryState
+        guard !placed, battery == .charging || battery == .full else { return }
+        placed = true
+        Haptic.success()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.2) { finish(confirmed: true) }
+    }
+
+    private func finish(confirmed: Bool) {
+        if confirmed { game.nightBaseKey = NightLock.nightKey() }
+        game.nightBaseSkipped = !confirmed
+    }
 }
 
 // MARK: - 基地に置く
@@ -366,8 +532,17 @@ struct BaseView: View {
             } else {
                 Text(battery == .unknown ? "この端末では充電をたしかめられないよ" : "充電ケーブルをさすと、じどうで はじまるよ")
                     .font(.dp(13, .bold)).foregroundColor(DP.gray)
-                Button { game.begin(atBase: false) } label: { Text("基地なしではじめる") }
-                    .buttonStyle(PuffyStyle(color: .white, height: 50, strong: false))
+                if !(game.pendingPlan?.forceBase ?? false) {
+                    Button { game.begin(atBase: false) } label: { Text("基地なしではじめる") }
+                        .buttonStyle(PuffyStyle(color: .white, height: 50, strong: false))
+                } else {
+                    Text("夜は、基地に置いてから ねよう").font(.dp(13, .heavy)).foregroundColor(DP.yellow)
+                    #if DEBUG
+                    if battery == .unknown {
+                        Button("（テスト用）基地なしで進む") { game.begin(atBase: false) }.font(.dp(12, .bold)).foregroundColor(DP.dim)
+                    }
+                    #endif
+                }
             }
         }
         .padding(.horizontal, 22)
@@ -391,6 +566,7 @@ struct BaseView: View {
         battery = UIDevice.current.batteryState
         guard !placed, battery == .charging || battery == .full else { return }
         placed = true
+        if game.pendingPlan?.forceBase ?? false { game.nightBaseKey = NightLock.nightKey() }
         Haptic.success()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
             if game.flow == .base { game.begin(atBase: true) }
@@ -403,6 +579,7 @@ struct BaseView: View {
 struct SessionRunView: View {
     @EnvironmentObject var game: GameState
     @State private var showBreath = false
+    @State private var showDM = false
     @State private var askEnd = false
     @State private var demoTaps = 0
 
@@ -414,6 +591,10 @@ struct SessionRunView: View {
         .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { now in game.tick(now) }
         .background(TopGlow(color: Color(hex: 0x3B2FA0), reach: 0.55))
         .sheet(isPresented: $showBreath) { BreathView(compact: true).environmentObject(game) }
+        .sheet(isPresented: $showDM) { SafariView(url: InstagramDM.url) }
+        #if DEBUG
+        .onAppear { if UserDefaults.standard.bool(forKey: "debugPeekSheet") { askEnd = true } }
+        #endif
     }
 
     private func content(elapsed e: TimeInterval, now: Date) -> some View {
@@ -461,7 +642,7 @@ struct SessionRunView: View {
                     if let left = peekLeft {
                         HStack(spacing: 6) {
                             Image(systemName: "eye.fill").font(.system(size: 12, weight: .bold))
-                            Text("中断中 ").font(.dp(12, .heavy))
+                            Text((game.peekReason.isEmpty ? "中断" : game.peekReason) + " 中… あと").font(.dp(12, .heavy))
                             Text(clock(left)).font(.num(14))
                         }
                         .foregroundColor(.black)
@@ -529,6 +710,22 @@ struct SessionRunView: View {
 
             Spacer(minLength: 0)
 
+            // DMはOK：ライフも使わず、タイマーも止めない
+            Button { Haptic.light(); showDM = true } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "paperplane.fill").font(.system(size: 13, weight: .bold))
+                    Text("DMだけ見る").font(.dp(14, .heavy))
+                    Text("ライフそのまま").font(.dp(11, .bold)).foregroundColor(DP.green)
+                }
+                .foregroundColor(.white)
+                .padding(.horizontal, 16).frame(height: 40)
+                .background(Capsule().fill(Color.white.opacity(0.1)))
+                .overlay(Capsule().strokeBorder(Color.white.opacity(0.18), lineWidth: 1))
+            }
+            .buttonStyle(PressStyle())
+            .frame(maxWidth: .infinity)
+            .accessibilityLabel(Text("インスタのDMだけ見る。ライフは使わない"))
+
             HStack(spacing: 12) {
                 Button { showBreath = true } label: { CircleIcon(system: "wind", size: 58) }
                     .buttonStyle(PressStyle())
@@ -566,11 +763,9 @@ struct SessionRunView: View {
             .buttonStyle(PuffyStyle(color: .white, height: 58, strong: false))
             .disabled(peeking)
             .opacity(peeking ? 0.5 : 1)
-            .alert("ライフを1つ使って中断する？", isPresented: $askEnd) {
-                Button("\(game.peekMinutes)分 中断する") { game.peek() }
-                Button("やっぱりやめる", role: .cancel) {}
-            } message: {
-                Text("\(game.peekMinutes)分たつと、またブロックにもどるよ。ライフはのこり\(game.lives)こ。")
+            .sheet(isPresented: $askEnd) {
+                PeekSheet().environmentObject(game)
+                    .presentationDetents([.large])
             }
         } else {
             Button { askEnd = true } label: {
@@ -588,7 +783,7 @@ struct SessionRunView: View {
 
     private func footerText(peeking: Bool) -> String {
         if peeking { return "\(game.peekMinutes)分たつか「もどる」で、ブロックとタイマーが再開するよ" }
-        if game.maxLives == 0 { return "ライフなしモード。⭐ ×" + String(format: "%.1f", rewardMultiplier(lives: game.maxLives, peekMinutes: game.peekMinutes)) }
+        if game.maxLives == 0 { return "ライフなしモード。⭐ ×" + String(format: "%.1f", rewardMultiplier(lives: game.maxLives, peekMinutes: 0)) }
         if game.lives == 0 { return "ライフがなくなっても大丈夫。ここまでの時間はちゃんと残るよ" }
         return "ゴールの時間になったら、じどうでおわるよ"
     }

@@ -22,6 +22,19 @@ enum NightLock {
     static var rangeText: String { String(format: "%d:00〜%d:00", start, end) }
     static var nightMinutes: Int { ((end - start + 24) % 24) * 60 }
 
+    /// 前のバージョン（アプリ版は常にブロック・1日の上限）を止める。起動時に1回だけ
+    static func migrateFromOldSettings() {
+        #if !DEMO
+        let d = UserDefaults.standard
+        guard !d.bool(forKey: "p.migratedV2") else { return }
+        d.set(true, forKey: "p.migratedV2")
+        DeviceActivityCenter().stopMonitoring([.daily])
+        Blocker.unblock(.always)
+        Blocker.unblock(.dailyLimit)
+        SharedSettings.alwaysBlocked = FamilyActivitySelection()
+        #endif
+    }
+
     /// はじめての夜（と、ねる時間をかえたとき）だけ、犬が予告する。予告するセリフを返す
     static func takeNotice() -> String? {
         guard isOn, isReady else { return nil }
@@ -93,7 +106,30 @@ enum NightLock {
     }
 
     /// きのうの夜からロックが有効だったら、けさ1回だけ「取り戻した時間」に足す分数
-    static func morningCredit(now: Date = Date()) -> Int? {
+    /// 夜の区切り（ねる時間の日付）。0時すぎは前の日の夜
+    static func nightKey(_ now: Date = Date()) -> String {
+        let h = Calendar.current.component(.hour, from: now)
+        let base = (start > end && h < end) ? now.addingTimeInterval(-86400) : now
+        return GameState.dayKey(base)
+    }
+
+    /// 基地に置く時間か（ねる30分前〜おきる時間）
+    static func isBaseTime(_ now: Date = Date()) -> Bool {
+        guard isOn, isReady else { return false }
+        let cal = Calendar.current
+        let m = cal.component(.hour, from: now) * 60 + cal.component(.minute, from: now)
+        let s = (start * 60 - 30 + 1440) % 1440, e = end * 60
+        return s <= e ? (m >= s && m < e) : (m >= s || m < e)
+    }
+
+    /// けさの分。counted = ゆうべ基地に置いていたか
+    static func morningCredit(now: Date = Date(), baseKey: String) -> (minutes: Int, counted: Bool)? {
+        guard let m = morningMinutes(now: now) else { return nil }
+        let lastNight = nightKey(now.addingTimeInterval(-Double(end + 1) * 3600))
+        return (m, baseKey == lastNight)
+    }
+
+    private static func morningMinutes(now: Date) -> Int? {
         #if DEMO
         return nil
         #endif

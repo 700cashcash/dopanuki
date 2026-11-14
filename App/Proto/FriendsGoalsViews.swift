@@ -32,6 +32,7 @@ struct FriendsView: View {
     @EnvironmentObject var game: GameState
     @StateObject private var steps = StepCounter()
     @State private var seg = 1   // 0 = いま, 1 = 時間, 2 = 歩数
+    @State private var showDM = false
 
     private let others = [
         Friend(name: "ゆうき", minutes: 27 * 60 + 40, steps: 6200, note: "いま置いてる・42分", scarf: DP.green, live: true),
@@ -67,6 +68,11 @@ struct FriendsView: View {
                     }
                     .buttonStyle(PuffyStyle(color: .green, height: 40, circle: true, strong: false))
                     .accessibilityLabel(Text("招待"))
+                    Button { Haptic.light(); showDM = true } label: {
+                        Image(systemName: "paperplane.fill").font(.system(size: 15, weight: .heavy))
+                    }
+                    .buttonStyle(PuffyStyle(color: .white, height: 40, circle: true, strong: false))
+                    .accessibilityLabel(Text("インスタのDMを開く"))
                 }
                 if seg == 0 { nowList } else { ranking }
             }
@@ -74,6 +80,7 @@ struct FriendsView: View {
             .padding(.bottom, 24)
         }
         .background(TopGlow(color: Color(hex: 0x1E9E5E).opacity(0.6), reach: 0.35))
+        .sheet(isPresented: $showDM) { SafariView(url: InstagramDM.url) }
         .onAppear {
             steps.refresh()
             #if DEBUG
