@@ -77,6 +77,7 @@ struct ProtoRoot: View {
             if d.bool(forKey: "debugBase") && game.flow == nil { game.start(SessionPlan(title: "25分", goalMinutes: 25)) }
             if d.bool(forKey: "debugNight") { game.nightToast = "おはよう！ねてる間に7時間取り戻したよ" }
             if d.bool(forKey: "debugNoNightBase") { game.nightBaseSkipped = true }
+            if d.bool(forKey: "debugIcon") { IconExport.run() }
             if d.bool(forKey: "debugPeek") && game.flow == nil {
                 game.start(SessionPlan(title: "25分", goalMinutes: 25, lives: 3, peekMinutes: 5, useBase: false))
                 game.demoBoost = 8 * 60 + 21; game.lives = 3
@@ -125,3 +126,30 @@ struct DPTabBar: View {
         .overlay(Rectangle().fill(DP.line).frame(height: 1), alignment: .top)
     }
 }
+
+#if DEBUG
+/// アプリアイコン（1024×1024）を書き出す。-debugIcon YES で起動すると Documents/AppIcon.png に保存
+struct IconArt: View {
+    var body: some View {
+        ZStack {
+            LinearGradient(colors: [Color(hex: 0x6A5CF0), DP.purple], startPoint: .top, endPoint: .bottom)
+            Blob(color: DP.pink, size: 620, period: 10).offset(x: 330, y: -330)
+            Blob(color: DP.green.opacity(0.9), size: 560, period: 12, offset: 0.4).offset(x: -360, y: 380)
+            DogView(size: 760, mood: .happy, blinks: false)
+                .offset(y: 40)
+        }
+        .frame(width: 1024, height: 1024)
+        .clipped()
+    }
+}
+
+enum IconExport {
+    @MainActor static func run() {
+        let r = ImageRenderer(content: IconArt())
+        r.scale = 1
+        guard let img = r.uiImage, let data = img.jpegData(compressionQuality: 1) else { return }
+        let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("AppIcon.jpg")
+        try? data.write(to: url)
+    }
+}
+#endif

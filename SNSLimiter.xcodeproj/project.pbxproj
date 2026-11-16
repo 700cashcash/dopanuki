@@ -32,6 +32,7 @@
 		4D7B55A6BCF1DAC7CFE26DA5 /* SafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44196EC1DB3661E9297D60DE /* SafariView.swift */; };
 		4D998085B246E1B44B592B25 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522E0054F6472A39F618929B /* ContentView.swift */; };
 		4FF1F8320F973025BBF2246F /* DogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E42467DC1D5F56AF3326BF5 /* DogView.swift */; };
+		4FF58FD2C517D9C0FF9C3ABE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9FA74EFE70F84FF770C9F4A7 /* Assets.xcassets */; };
 		50D09C71E5DC410F8716E07B /* DogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E42467DC1D5F56AF3326BF5 /* DogView.swift */; };
 		541C3391D363C706D8348327 /* Scenes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F3CEDA732D84417BD4730A /* Scenes.swift */; };
 		54FCD74496FF3098AF542C53 /* SNSLimiterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDE7C3DFD9D1F4C2F228490 /* SNSLimiterApp.swift */; };
@@ -40,6 +41,7 @@
 		62814ED5EA3265B4DB9030CE /* RoadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E6054DD9AF06F37DC138250 /* RoadView.swift */; };
 		6483D55E63B50E53B708B885 /* SharedSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAB83050EB68D761E4D7A74 /* SharedSettings.swift */; };
 		71FFA57AFA4A39E7A2095843 /* RoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA4E7EB7C3369DB69717F84 /* RoomView.swift */; };
+		7370ABDE0B06B4AD1F9A9945 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9FA74EFE70F84FF770C9F4A7 /* Assets.xcassets */; };
 		73F38955B4A50F1C0650709C /* MonitorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E449798AD3D281282B01702E /* MonitorExtension.swift */; };
 		75639C9F6D334B7EE132B4DF /* FriendsGoalsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADD2137EF0DF93E0AAA10332 /* FriendsGoalsViews.swift */; };
 		77C86B99E88752636AB3ADA0 /* LessonViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592CBC84FF2CFC8D2128B505 /* LessonViews.swift */; };
@@ -145,6 +147,7 @@
 		87EDA0B15179E03276C09288 /* ReportExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = ReportExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		8CCEC8F3041A3AED1C195077 /* blockerList.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = blockerList.json; sourceTree = "<group>"; };
 		8E42467DC1D5F56AF3326BF5 /* DogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogView.swift; sourceTree = "<group>"; };
+		9FA74EFE70F84FF770C9F4A7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A2573CF7125E72BDF1BBD70C /* ShieldExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = ShieldExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		A39C130ABBA286C99DFB230F /* Declare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Declare.swift; sourceTree = "<group>"; };
 		ADD2137EF0DF93E0AAA10332 /* FriendsGoalsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsGoalsViews.swift; sourceTree = "<group>"; };
@@ -200,6 +203,7 @@
 		6AF29879B2CD7226F5B01D00 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				9FA74EFE70F84FF770C9F4A7 /* Assets.xcassets */,
 				522E0054F6472A39F618929B /* ContentView.swift */,
 				21FA95B9F1CBA7248EA3858A /* Info.plist */,
 				7CA8F4EC00D5755FFFA72F0E /* InfoDemo.plist */,
@@ -305,6 +309,7 @@
 			buildConfigurationList = B67E5385385EA005EE77B7DE /* Build configuration list for PBXNativeTarget "SNSLimiter" */;
 			buildPhases = (
 				9CEA01D7EC6AC1A60EB23326 /* Sources */,
+				CDFE6337739F6F23A97E7828 /* Resources */,
 				68FFAC7018EE91D835ECC9E1 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
@@ -361,6 +366,7 @@
 			buildConfigurationList = 15D3327230963CBB314F41C8 /* Build configuration list for PBXNativeTarget "SNSLimiterDemo" */;
 			buildPhases = (
 				624AC519AC62086C7F7B9DA0 /* Sources */,
+				62F586990EE96D7922F539CD /* Resources */,
 			);
 			buildRules = (
 			);
@@ -449,6 +455,22 @@
 			buildActionMask = 2147483647;
 			files = (
 				79EF39B19B5E22257FCABF93 /* blockerList.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		62F586990EE96D7922F539CD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7370ABDE0B06B4AD1F9A9945 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CDFE6337739F6F23A97E7828 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4FF58FD2C517D9C0FF9C3ABE /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
