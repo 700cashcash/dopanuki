@@ -179,11 +179,18 @@ enum DMGate {
 /// 遮断を外してから反映されるまで少し待って、それから開く（先に開くと制限ページのままになる）
 struct InstagramDMView: View {
     @State private var ready = false
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         ZStack {
             if ready {
-                SafariView(url: InstagramDM.url).ignoresSafeArea()
+                // 「完了」でも、下にスワイプして閉じても、すぐブロックを戻す
+                SafariView(url: InstagramDM.url) {
+                    DMGate.visible = false
+                    DMGate.close()
+                    dismiss()
+                }
+                .ignoresSafeArea()
             } else {
                 VStack(spacing: 14) {
                     DogView(size: 90, mood: .happy)

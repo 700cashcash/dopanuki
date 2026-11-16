@@ -13,6 +13,7 @@ struct LaunchRoomView: View {
     @State private var yofukashi = false
     @State private var quizAnswer: Int?
     @State private var lineToken = 0
+    @Environment(\.scenePhase) private var scenePhase
 
     private var hour: Int {
         #if DEBUG
@@ -53,6 +54,7 @@ struct LaunchRoomView: View {
         .padding(.top, 8)
         .background(TopGlow(color: tint.opacity(locked ? 0.2 : 0.55), reach: 0.45))
         .sheet(isPresented: $showSettings) { LaunchSettingsView().environmentObject(game).environmentObject(life) }
+        .onChange(of: scenePhase) { p in if p == .active { arrive() } }
         .onAppear {
             arrive()
             #if DEBUG
@@ -147,7 +149,11 @@ struct LaunchRoomView: View {
                     if let n = life.neenee, !locked {
                         neeneeCard(n).transition(.scale(scale: 0.8, anchor: .bottom).combined(with: .opacity))
                     } else if let l = line {
-                        Bubble(text: glitched(l)).transition(.scale(scale: 0.7).combined(with: .opacity))
+                        Bubble(text: glitched(l))
+                            .lineLimit(4)
+                            .minimumScaleFactor(0.85)
+                            .onTapGesture { lineToken += 1; line = nil }
+                            .transition(.scale(scale: 0.7).combined(with: .opacity))
                     }
                     Spacer()
                 }
@@ -190,8 +196,15 @@ struct LaunchRoomView: View {
             say(g.text, for: 3.5)
             if g.back { celebrate() } else if life.kimo == 0 { Haptic.light() }
             DispatchQueue.main.asyncAfter(deadline: .now() + 3.8) { life.pickNeenee() }
-        } else {
-            life.pickNeenee()
+            return
+        }
+        life.pickNeenee()
+        // ねえねえが出ないときは、ひとことtips（朝のあいさつ・ねえねえが優先）
+        guard life.neenee == nil else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            guard life.neenee == nil, !locked else { return }
+            Haptic.light()
+            say("んま。" + life.nextTip(), for: 5)
         }
     }
 

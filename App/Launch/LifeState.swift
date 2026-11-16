@@ -44,7 +44,9 @@ struct LifeData: Codable {
     var weekCardKey = ""
     var kimoPreview = -1             // 開発用：-1 = 本物、0〜4 = 見た目を固定
     var sleepTalkDay = ""
-    var sleepKey = ""                // おやすみロックOFFで「おやすみ」した夜（部屋を消灯するだけ）
+    var sleepKey = ""
+    var tipOrder: [Int] = []         // tips を出す順番（一周したらシャッフルしなおす）
+    var tipPos = 0                // おやすみロックOFFで「おやすみ」した夜（部屋を消灯するだけ）
 }
 
 final class LifeState: ObservableObject {
@@ -153,6 +155,23 @@ final class LifeState: ObservableObject {
             ][min(k, 4) - 1], false)
         }
         return ("おはよ！ きょうもツヤツヤ", false)
+    }
+
+    // MARK: ひとことtips（開くたび。ねえねえの回数には数えない）
+
+    /// 次のtip。前回と同じものは続けて出さない
+    func nextTip() -> String {
+        let n = DetoxTips.all.count
+        if data.tipOrder.count != n || data.tipPos >= n {
+            let last = data.tipOrder.last
+            var order = Array(0..<n).shuffled()
+            if order.first == last, n > 1 { order.swapAt(0, 1) }
+            data.tipOrder = order
+            data.tipPos = 0
+        }
+        let t = DetoxTips.all[data.tipOrder[data.tipPos]]
+        data.tipPos += 1
+        return t
     }
 
     // MARK: ねえねえ（1日3回まで）
