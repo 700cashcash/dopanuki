@@ -32,6 +32,9 @@
       "url-filter": "^https?://([a-z]+\\.)?instagram\\.com/reels?/",
       "resource-type": [
         "document"
+      ],
+      "unless-top-url": [
+        "^https?://([a-z]+\\.)?instagram\\.com/direct/"
       ]
     },
     "action": {
@@ -40,7 +43,10 @@
   },
   {
     "trigger": {
-      "url-filter": "^https?://([a-z]+\\.)?instagram\\.com/api/v1/clips/"
+      "url-filter": "^https?://([a-z]+\\.)?instagram\\.com/api/v1/clips/",
+      "unless-top-url": [
+        "^https?://([a-z]+\\.)?instagram\\.com/direct/"
+      ]
     },
     "action": {
       "type": "block"
@@ -48,7 +54,10 @@
   },
   {
     "trigger": {
-      "url-filter": "^https?://([a-z]+\\.)?instagram\\.com/"
+      "url-filter": "^https?://([a-z]+\\.)?instagram\\.com/",
+      "unless-top-url": [
+        "^https?://([a-z]+\\.)?instagram\\.com/direct/"
+      ]
     },
     "action": {
       "type": "css-display-none",

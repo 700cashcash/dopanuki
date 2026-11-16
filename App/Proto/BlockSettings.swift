@@ -151,6 +151,7 @@ enum DMGate {
             let store = ManagedSettingsStore(named: name)
             store.shield.webDomains = nil
             store.shield.webDomainCategories = nil
+            store.webContent.blockedByFilter = nil
         }
         #endif
     }
@@ -167,11 +168,28 @@ enum DMGate {
 }
 
 /// DM画面（開いている間だけサイトの遮断を外す）
+/// 遮断を外してから反映されるまで少し待って、それから開く（先に開くと制限ページのままになる）
 struct InstagramDMView: View {
+    @State private var ready = false
+
     var body: some View {
-        SafariView(url: InstagramDM.url)
-            .ignoresSafeArea()
-            .onAppear { DMGate.open() }
-            .onDisappear { DMGate.visible = false; DMGate.close() }
+        ZStack {
+            if ready {
+                SafariView(url: InstagramDM.url).ignoresSafeArea()
+            } else {
+                VStack(spacing: 14) {
+                    DogView(size: 90, mood: .happy)
+                    ProgressView().tint(.white)
+                    Text("DMをひらくよ…").font(.dp(14, .heavy)).foregroundColor(DP.gray)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(DP.bg.ignoresSafeArea())
+            }
+        }
+        .onAppear {
+            DMGate.open()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) { ready = true }
+        }
+        .onDisappear { DMGate.visible = false; DMGate.close() }
     }
 }
