@@ -25,7 +25,8 @@ struct LaunchRoomView: View {
         #if DEBUG
         if UserDefaults.standard.bool(forKey: "debugLocked") { return true }
         #endif
-        return NightLock.isSleepTime(game.clock) && game.nightBaseKey == NightLock.nightKey(game.clock)
+        let key = NightLock.nightKey(game.clock)
+        return NightLock.isSleepTime(game.clock) && (game.nightBaseKey == key || life.data.sleepKey == key)
     }
     private var tint: Color {
         if locked { return Color(hex: 0x0C0E24) }

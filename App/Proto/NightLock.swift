@@ -80,11 +80,13 @@ enum NightLock {
         return
         #endif
         let center = DeviceActivityCenter()
-        guard isOn && isReady else {
+        // おやすみロックがOFFでも、夜ふかし計測のために夜のスケジュールは動かす（遮断だけしない）
+        guard isReady else {
             center.stopMonitoring([.night])
             Blocker.unblock(.nightBlock)
             return
         }
+        if !isOn { Blocker.unblock(.nightBlock) }
         let eventsVersion = "v1-\(start)-\(end)"
         if let cur = center.schedule(for: .night),
            cur.intervalStart.hour == start, cur.intervalEnd.hour == end,
@@ -127,6 +129,11 @@ enum NightLock {
     /// 基地に置く時間か（ねる30分前〜おきる時間）
     static func isBaseTime(_ now: Date = Date()) -> Bool {
         guard isOn, isReady else { return false }
+        return isBedWindow(now)
+    }
+
+    /// ねる30分前〜おきる時間（おやすみロックのON/OFFに関係なく）
+    static func isBedWindow(_ now: Date = Date()) -> Bool {
         let cal = Calendar.current
         let m = cal.component(.hour, from: now) * 60 + cal.component(.minute, from: now)
         let s = (start * 60 - 30 + 1440) % 1440, e = end * 60

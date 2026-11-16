@@ -77,6 +77,15 @@ struct LaunchRoot: View {
         }
     }
 
+    /// 寝る前のおしゃべり（ロックON/OFFどちらでも、ねる30分前から1回）
+    private var showBedChat: Bool {
+        if debugBedChat { return true }
+        guard !chatDone, life.data.planDay != LifeState.today(), NightLock.isBedWindow(game.clock) else { return false }
+        let key = NightLock.nightKey(game.clock)
+        guard game.nightBaseKey != key, life.data.sleepKey != key else { return false }
+        return NightLock.isOn ? game.needsNightBase : true
+    }
+
     private var main: some View {
         Group {
             switch tab {
@@ -91,12 +100,15 @@ struct LaunchRoot: View {
         .background(DP.bg.ignoresSafeArea())
         // おやすみ：寝る前のおしゃべり → 基地につなぐまで すすめない
         .overlay {
-            if game.needsNightBase || debugBedChat {
-                if !chatDone && life.data.planDay != LifeState.today() {
-                    BedtimeChatView { chatDone = true }.transition(.opacity)
-                } else {
-                    NightBaseView().environmentObject(game).transition(.opacity)
+            if showBedChat {
+                BedtimeChatView(lockOn: NightLock.isOn) {
+                    chatDone = true
+                    // おやすみロックOFF：ロックなしで部屋を消灯するだけ
+                    if !NightLock.isOn { life.data.sleepKey = NightLock.nightKey(game.clock) }
                 }
+                .transition(.opacity)
+            } else if game.needsNightBase {
+                NightBaseView().environmentObject(game).transition(.opacity)
             }
         }
     }
@@ -189,6 +201,7 @@ struct LaunchSettingsView: View {
     @State private var wake = SharedSettings.nightEndHour
     @State private var devTaps = 0
     @State private var bgm = BowlPlayer.shared.bgmEnabled
+    @State private var nightLock = SharedSettings.nightBlockEnabled
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -205,6 +218,26 @@ struct LaunchSettingsView: View {
                             sub: NightLock.hasTargets ? "えらんである" : "まだ えらんでないよ")
                     }
                     .buttonStyle(PressStyle(scale: 0.97))
+                }
+
+                section("おやすみロック") {
+                    Toggle(isOn: Binding(get: { nightLock }, set: { v in
+                        nightLock = v
+                        SharedSettings.nightBlockEnabled = v
+                        if !v { Blocker.unblock(.nightBlock) }
+                        UserDefaults.standard.removeObject(forKey: "p.nightEvents")
+                        NightLock.apply()
+                        Haptic.select()
+                    })) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("夜はSNSをロック").font(.dp(15, .heavy))
+                            Text(nightLock ? "ねる前に基地（充電）につなぐよ" : "OFF：ロックも基地もなし。部屋が消灯するだけ")
+                                .font(.dp(12, .bold)).foregroundColor(DP.gray)
+                        }
+                    }
+                    .tint(DP.violet)
+                    .padding(14)
+                    .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(DP.card))
                 }
 
                 section("寝る時間") {
@@ -336,6 +369,7 @@ struct LaunchSettingsView: View {
 
 struct BedtimeChatView: View {
     @EnvironmentObject var life: LifeState
+    var lockOn = true
     var onDone: () -> Void
     @State private var step = 0
     @State private var done = ""
@@ -366,7 +400,7 @@ struct BedtimeChatView: View {
                         life.saveNight(done: done, tomorrow: tomorrow)
                         Haptic.success()
                         onDone()
-                    } label: { Label("ねかせる", systemImage: "moon.zzz.fill") }
+                    } label: { Label(lockOn ? "ねかせる" : "おやすみ", systemImage: "moon.zzz.fill") }
                         .buttonStyle(PuffyStyle(color: .purple, height: 58))
                 }
             }

@@ -123,7 +123,7 @@ struct OnboardingView: View {
                 Image(systemName: "arrow.right").foregroundColor(DP.gray)
                 hourBox("おきる", $wake)
             }
-            Text("ねる30分前に、スマホを充電（基地）につなぐよ").font(.dp(12, .bold)).foregroundColor(DP.dim)
+            Text("ねる30分前に、スマホを充電（基地）につなぐよ。あとで設定でオフにできるよ").font(.dp(12, .bold)).foregroundColor(DP.dim)
             Spacer(minLength: 0)
             Button {
                 SharedSettings.nightBlockEnabled = true

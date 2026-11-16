@@ -7,7 +7,8 @@ class MonitorExtension: DeviceActivityMonitor {
         super.intervalDidStart(for: activity)
         switch activity {
         case .daily: Blocker.unblock(.dailyLimit)  // 新しい1日：時間制限をリセット
-        case .night: Blocker.block(.nightBlock)    // 夜間ブロック開始
+        case .night:                               // 夜間ブロック開始（おやすみロックがOFFなら計測だけ）
+            if SharedSettings.nightBlockEnabled { Blocker.block(.nightBlock) }
         default: break
         }
     }

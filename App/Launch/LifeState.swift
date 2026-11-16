@@ -44,6 +44,7 @@ struct LifeData: Codable {
     var weekCardKey = ""
     var kimoPreview = -1             // 開発用：-1 = 本物、0〜4 = 見た目を固定
     var sleepTalkDay = ""
+    var sleepKey = ""                // おやすみロックOFFで「おやすみ」した夜（部屋を消灯するだけ）
 }
 
 final class LifeState: ObservableObject {
