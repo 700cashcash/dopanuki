@@ -13,6 +13,7 @@ struct LaunchRoomView: View {
     @State private var yofukashi = false
     @State private var quizAnswer: Int?
     @State private var lineToken = 0
+    @State private var yawning = false
     @Environment(\.scenePhase) private var scenePhase
 
     private var hour: Int {
@@ -44,10 +45,9 @@ struct LaunchRoomView: View {
         VStack(spacing: 16) {
             topBar
             room
-            Button { game.flow = .pick } label: { Label("時間を取り戻す", systemImage: "play.fill") }
+            Button(action: startTapped) { Label("時間を取り戻す", systemImage: "play.fill") }
                 .buttonStyle(PuffyStyle(color: .blue, height: 66))
-                .disabled(locked)
-                .opacity(locked ? 0.4 : 1)
+                .opacity(locked ? 0.75 : 1)
             Spacer(minLength: 0)
         }
         .padding(.horizontal, 20)
@@ -125,7 +125,7 @@ struct LaunchRoomView: View {
 
                 // ドパ抜きちゃん
                 DogView(size: 190, mood: locked ? .sleep : (squish || (line != nil && life.kimo == 0) ? .happy : .normal),
-                        pose: DogPose(squash: squish ? 0.7 : 0), kimo: locked ? 0 : life.kimo, alive: !locked)
+                        pose: DogPose(mouthOpen: yawning ? 0.8 : 0, squash: squish ? 0.7 : 0), kimo: locked ? 0 : life.kimo, alive: !locked)
                     .bob(locked ? 2 : 4, period: locked ? 3.4 : 2.8)
                     .contentShape(Rectangle())
                     .gesture(petGesture)
@@ -171,6 +171,16 @@ struct LaunchRoomView: View {
     private func glitched(_ s: String) -> String {
         guard life.kimo >= 4, !locked else { return s }
         return String(s.enumerated().map { i, c in i % 4 == 2 ? "▯" : c })
+    }
+
+    /// 「時間を取り戻す」。夜のロック中でも押せる（眠そうに ひとこと言ってから）
+    private func startTapped() {
+        guard locked else { game.flow = .pick; return }
+        Haptic.soft(0.6)
+        withAnimation(.easeInOut(duration: 0.4)) { yawning = true }
+        say("…えらいけど、終わったらねよ", for: 2)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) { withAnimation { yawning = false } }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.7) { game.flow = .pick }
     }
 
     // MARK: 開いたとき

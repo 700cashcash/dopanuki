@@ -14,11 +14,16 @@ struct WelcomeBackView: View {
     @State private var hearts: [UUID] = []
 
     private var sad: Bool { !result.completed && result.minutes < max(1, result.goal) }
+    /// おやすみ時間（夜のロック中・消灯中）のおかえりは、ねむそう版
+    private var sleepy: Bool {
+        let key = NightLock.nightKey()
+        return NightLock.isSleepTime() && (game.nightBaseKey == key || life.data.sleepKey == key)
+    }
 
     var body: some View {
         ZStack {
             TopGlow(color: sad ? Color(hex: 0x3B2FA0) : Color(hex: 0x1E9E5E), reach: 0.6)
-            if phase >= 2 && !sad { Confetti().ignoresSafeArea() }
+            if phase >= 2 && !sad && !sleepy { Confetti().ignoresSafeArea() }
             if phase < 3 { reaction } else { resultCard.transition(.move(edge: .bottom).combined(with: .opacity)) }
         }
         .animation(.spring(response: 0.45, dampingFraction: 0.8), value: phase)
@@ -76,7 +81,7 @@ struct WelcomeBackView: View {
         if sad {
             pose = DogPose(headTilt: -8, eyes: .normal)
             phase = 2
-            line = "またいっしょにやろ"
+            line = "またいっしょにやろ" + (sleepy ? "…じゃ、ねよ" : "")
             praise = result.minutes > 0 ? "\(result.minutes)分でも、えらいよ" : ""
             Haptic.soft(0.5)
             return
@@ -89,10 +94,10 @@ struct WelcomeBackView: View {
         }
         // むぎゅっ：飛びついて、体ごとつぶれて戻る
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            withAnimation(.easeOut(duration: 0.15)) { jump = 40 }
+            withAnimation(.easeOut(duration: 0.15)) { jump = sleepy ? 14 : 40 }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                 Haptic.medium()
-                withAnimation(.spring(response: 0.18, dampingFraction: 0.45)) { jump = 0; pose.squash = 1 }
+                withAnimation(.spring(response: 0.18, dampingFraction: 0.45)) { jump = 0; pose.squash = sleepy ? 0.4 : 1 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.4)) { pose.squash = 0 }
                 }
@@ -101,11 +106,12 @@ struct WelcomeBackView: View {
         // ごほうび顔：こっちを見て「ありがと」
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             Haptic.success()
-            line = Self.line(for: result.minutes)
+            line = Self.line(for: result.minutes) + (sleepy ? "…じゃ、ねよ" : "")
             praise = Self.praise(purpose: result.purpose, minutes: result.minutes)
             withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
                 phase = 2
-                pose = DogPose(tailWag: 10, mouthOpen: 0.5, paw: true)
+                pose = sleepy ? DogPose(tailWag: 4, mouthOpen: 0.3, eyes: .sleep, paw: true)
+                              : DogPose(tailWag: 10, mouthOpen: 0.5, paw: true)
             }
             for i in 0..<6 {
                 DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 0.12) { hearts.append(UUID()) }
