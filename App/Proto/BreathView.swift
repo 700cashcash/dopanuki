@@ -41,7 +41,7 @@ struct BreathView: View {
         let got = game.addBreath(seconds: seconds)
         if !got.isEmpty {
             Haptic.success()
-            withAnimation(.spring(response: 0.45, dampingFraction: 0.6)) { unlocked = got }
+            if !AppMode.launch { withAnimation(.spring(response: 0.45, dampingFraction: 0.6)) { unlocked = got } }
         }
     }
 
@@ -195,7 +195,7 @@ struct BreathView: View {
             .padding(.top, 6)
             .allowsHitTesting(false)
             if !compact && startedAt == nil {
-                HStack { roadPill; Spacer() }
+                HStack { if !AppMode.launch { roadPill }; Spacer() }
                     .padding(.horizontal, 20)
                     .padding(.top, 8)
             }
@@ -219,7 +219,7 @@ struct BreathView: View {
                         .offset(y: -6 * CGFloat(wave))
                     if finished {
                         Text("できた！").font(.num(40))
-                        Text("+10 ⭐").font(.dp(14, .heavy)).foregroundColor(DP.yellow)
+                        if !AppMode.launch { Text("+10 ⭐").font(.dp(14, .heavy)).foregroundColor(DP.yellow) }
                     } else if startedAt != nil {
                         Text(clock(remain)).font(.num(40))
                         Text(inhale ? "すって…" : "はいて…").font(.dp(15, .bold)).foregroundColor(Color(hex: 0xD8D2FF))
@@ -236,7 +236,7 @@ struct BreathView: View {
 
             if startedAt == nil {
                 VStack(spacing: 14) {
-                    soundChips.padding(.horizontal, -20)
+                    if !AppMode.launch { soundChips.padding(.horizontal, -20) }
                     HStack(spacing: 8) {
                         ForEach(lengths.indices, id: \.self) { i in
                             Button { Haptic.select(); lengthIndex = i; finished = false } label: {

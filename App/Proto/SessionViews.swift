@@ -9,7 +9,11 @@ struct SessionFlowView: View {
             DP.bg.ignoresSafeArea()
             switch game.flow {
             case .pick, .none:
-                SessionPickView().transition(.opacity)
+                if AppMode.launch {
+                    LaunchPickView().transition(.opacity)
+                } else {
+                    SessionPickView().transition(.opacity)
+                }
             case .base:
                 BaseView().transition(.opacity)
             case .declare:
@@ -17,7 +21,11 @@ struct SessionFlowView: View {
             case .running:
                 SessionRunView().transition(.move(edge: .bottom).combined(with: .opacity))
             case .result(let r):
-                ResultView(result: r).transition(.scale(scale: 0.9).combined(with: .opacity))
+                if AppMode.launch {
+                    WelcomeBackView(result: r).transition(.scale(scale: 0.9).combined(with: .opacity))
+                } else {
+                    ResultView(result: r).transition(.scale(scale: 0.9).combined(with: .opacity))
+                }
             }
         }
         .animation(.spring(response: 0.45, dampingFraction: 0.85), value: game.flow)
@@ -349,14 +357,16 @@ struct PeekSheet: View {
                     Button { dismiss() } label: { CircleIcon(system: "xmark") }.buttonStyle(PressStyle())
                     Spacer()
                     HStack(spacing: 3) {
-                        ForEach(0..<game.lives, id: \.self) { _ in Image(systemName: "heart.fill").foregroundColor(DP.pink) }
+                        if !AppMode.launch {
+                            ForEach(0..<game.lives, id: \.self) { _ in Image(systemName: "heart.fill").foregroundColor(DP.pink) }
+                        }
                     }
                 }
                 HStack(spacing: 10) {
                     DogView(size: 64)
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("中断する").font(.dp(26, .heavy))
-                        Text("なにに使うか、きめてからね").font(.dp(13, .bold)).foregroundColor(DP.gray)
+                        Text(AppMode.launch ? "何しに開く？" : "中断する").font(.dp(26, .heavy))
+                        Text(AppMode.launch ? "ひとつ決めてから、開こうね" : "なにに使うか、きめてからね").font(.dp(13, .bold)).foregroundColor(DP.gray)
                     }
                 }
 
@@ -395,7 +405,7 @@ struct PeekSheet: View {
                 Button {
                     game.peek(minutes: minutes, reason: purpose)
                     dismiss()
-                } label: { Label(purpose.isEmpty ? "なにに使うか えらんでね" : "\(minutes)分 中断する（ライフ−1）", systemImage: "pause.fill") }
+                } label: { Label(purpose.isEmpty ? "なにに使うか えらんでね" : (AppMode.launch ? "\(minutes)分だけ開く" : "\(minutes)分 中断する（ライフ−1）"), systemImage: "pause.fill") }
                     .buttonStyle(PuffyStyle(color: .white, height: 56, strong: false))
                     .disabled(purpose.isEmpty)
                     .opacity(purpose.isEmpty ? 0.5 : 1)
@@ -581,6 +591,7 @@ struct SessionRunView: View {
     @State private var showBreath = false
     @State private var showDM = false
     @State private var askEnd = false
+    @State private var quit = false
     @State private var demoTaps = 0
 
     var body: some View {
@@ -659,10 +670,12 @@ struct SessionRunView: View {
 
             HStack(alignment: .bottom) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(peekLeft != nil ? "中断中" : game.sessionTitle).font(.dp(20, .heavy))
+                    Text(peekLeft != nil ? "中断中" : (AppMode.launch && !game.sessionPurpose.isEmpty ? game.sessionPurpose + "中" : game.sessionTitle)).font(.dp(20, .heavy))
                         .foregroundColor(peekLeft != nil ? DP.yellow : .white)
                     if peekLeft != nil {
                         Text("タイマーは止まってるよ").font(.dp(13, .medium)).foregroundColor(DP.gray)
+                    } else if AppMode.launch {
+                        Text(game.sessionTitle + " おやすみ中").font(.dp(13, .medium)).foregroundColor(DP.gray)
                     } else {
                     HStack(spacing: 0) {
                         Text("あと\(nextBoneMin)分で ").font(.dp(13, .medium)).foregroundColor(DP.gray)
@@ -672,11 +685,13 @@ struct SessionRunView: View {
                     }
                 }
                 Spacer()
+                if !AppMode.launch {
                 HStack(spacing: 4) {
                     ForEach(0..<game.maxLives, id: \.self) { i in
                         Image(systemName: i < game.lives ? "heart.fill" : "heart")
                             .foregroundColor(i < game.lives ? DP.pink : Color(hex: 0x3A3A3A))
                     }
+                }
                 }
             }
 
@@ -715,7 +730,7 @@ struct SessionRunView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "paperplane.fill").font(.system(size: 13, weight: .bold))
                     Text("DMだけ見る").font(.dp(14, .heavy))
-                    Text("ライフそのまま").font(.dp(11, .bold)).foregroundColor(DP.green)
+                    Text(AppMode.launch ? "タイマーそのまま" : "ライフそのまま").font(.dp(11, .bold)).foregroundColor(DP.green)
                 }
                 .foregroundColor(.white)
                 .padding(.horizontal, 16).frame(height: 40)
@@ -748,6 +763,15 @@ struct SessionRunView: View {
                 .font(.dp(12, .bold)).foregroundColor(DP.dim)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
+            if AppMode.launch && peekLeft == nil {
+                Button("ここまでにする") { quit = true }
+                    .font(.dp(12, .heavy)).foregroundColor(DP.gray)
+                    .frame(maxWidth: .infinity)
+                    .alert("ここまでにする？", isPresented: $quit) {
+                        Button("おわる") { game.finish() }
+                        Button("もうすこし", role: .cancel) {}
+                    } message: { Text("ここまでの時間は、ちゃんと記録するよ") }
+            }
         }
         .padding(.horizontal, 24)
         .padding(.top, 8)
@@ -758,7 +782,7 @@ struct SessionRunView: View {
     private func peekButton(peeking: Bool) -> some View {
         if game.lives > 0 {
             Button { askEnd = true } label: {
-                Label(peeking ? "中断中" : "中断する（ライフ−1）", systemImage: "pause.fill")
+                Label(peeking ? "中断中" : (AppMode.launch ? "開きたい" : "中断する（ライフ−1）"), systemImage: "pause.fill")
             }
             .buttonStyle(PuffyStyle(color: .white, height: 58, strong: false))
             .disabled(peeking)
@@ -783,6 +807,7 @@ struct SessionRunView: View {
 
     private func footerText(peeking: Bool) -> String {
         if peeking { return "\(game.peekMinutes)分たつか「もどる」で、ブロックとタイマーが再開するよ" }
+        if AppMode.launch { return "時間になったら、じどうでおわるよ" }
         if game.maxLives == 0 { return "ライフなしモード。⭐ ×" + String(format: "%.1f", rewardMultiplier(lives: game.maxLives, peekMinutes: 0)) }
         if game.lives == 0 { return "ライフがなくなっても大丈夫。ここまでの時間はちゃんと残るよ" }
         return "ゴールの時間になったら、じどうでおわるよ"

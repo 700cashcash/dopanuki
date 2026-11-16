@@ -20,5 +20,6 @@ class MonitorExtension: DeviceActivityMonitor {
     override func eventDidReachThreshold(_ event: DeviceActivityEvent.Name, activity: DeviceActivityName) {
         super.eventDidReachThreshold(event, activity: activity)
         if event == .limitReached { Blocker.block(.dailyLimit) }  // 今日の上限に到達
+        if activity == .night { NightUsage.record(event: event) } // 夜ふかしした分を記録
     }
 }

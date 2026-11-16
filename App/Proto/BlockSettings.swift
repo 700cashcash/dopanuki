@@ -96,6 +96,7 @@ struct BlockSettingsView: View {
         .familyActivityPicker(isPresented: $showPicker, selection: $selection)
         .onChange(of: selection) { s in
             SharedSettings.selection = s
+            UserDefaults.standard.removeObject(forKey: "p.nightEvents")   // 夜ふかし計測も選びなおしたアプリで
             NightLock.apply()
             Haptic.success()
         }
