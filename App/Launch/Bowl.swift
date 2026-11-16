@@ -1,5 +1,10 @@
 import AVFoundation
 
+/// 機能のスイッチ。ローンチ版は音なし（音のコードはアップデート用に残す）
+enum Features {
+    static let soundEnabled = false
+}
+
 /// 音の種類（アップデートで ここに足していく。いまは1種を使う）
 struct SoundPreset: Identifiable {
     struct Partial { let ratio: Double; let amp: Double; let decay: Double }
@@ -242,7 +247,7 @@ final class BowlPlayer {
 
     /// 部屋などにいるとき：小さいドローン＋ときどき1回
     func startAmbient() {
-        guard bgmEnabled, mode != .breath else { return }
+        guard Features.soundEnabled, bgmEnabled, mode != .breath else { return }
         whenReady { [weak self] in self?.startAmbientNow() }
     }
 
@@ -265,6 +270,7 @@ final class BowlPlayer {
 
     /// バックグラウンド・おやすみロック中：フェードアウトして止める
     func stopAll(fade: Double = 1) {
+        guard Features.soundEnabled else { return }
         ambientTimer?.invalidate()
         mode = .off
         guard ready else { return }
@@ -280,7 +286,7 @@ final class BowlPlayer {
 
     /// 呼吸をはじめる：2〜3秒で音量を上げて、ボウル1回
     func begin() {
-        guard enabled else { return }
+        guard Features.soundEnabled, enabled else { return }
         mode = .breath
         whenReady { [weak self] in self?.beginNow() }
     }
@@ -296,7 +302,7 @@ final class BowlPlayer {
 
     /// すうはじめに やさしく1回（余韻が重なる）
     func strike(volume: Float = 0.8) {
-        guard mode == .breath else { return }
+        guard Features.soundEnabled, mode == .breath else { return }
         strikeNow(volume: volume)
     }
 

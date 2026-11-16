@@ -222,6 +222,7 @@ struct LaunchSettingsView: View {
                     field("カードに出る自分の なまえ", $game.userName)
                 }
 
+                if Features.soundEnabled {
                 section("音") {
                     Toggle(isOn: Binding(get: { bgm }, set: { bgm = $0; BowlPlayer.shared.bgmEnabled = $0; Haptic.select() })) {
                         VStack(alignment: .leading, spacing: 2) {
@@ -232,6 +233,7 @@ struct LaunchSettingsView: View {
                     .tint(DP.violet)
                     .padding(14)
                     .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(DP.card))
+                }
                 }
 
                 section("インスタ") {

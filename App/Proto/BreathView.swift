@@ -188,7 +188,8 @@ struct BreathView: View {
                     Button { dismiss() } label: { CircleIcon(system: "xmark") }.buttonStyle(PressStyle())
                 }
                 Spacer()
-                // ボウルの音 ON/OFF
+                // ボウルの音 ON/OFF（ローンチ版は音なしなので出さない）
+                if Features.soundEnabled {
                 Button {
                     soundOn.toggle()
                     BowlPlayer.shared.enabled = soundOn
@@ -197,6 +198,7 @@ struct BreathView: View {
                 } label: { CircleIcon(system: soundOn ? "speaker.wave.2.fill" : "speaker.slash.fill") }
                     .buttonStyle(PressStyle())
                     .accessibilityLabel(Text(soundOn ? "音を消す" : "音を出す"))
+                }
             }
             .frame(height: 44)
             .padding(.horizontal, 20)
