@@ -147,12 +147,20 @@ enum DMGate {
         visible = true
         #if !DEMO
         UserDefaults.standard.set(true, forKey: flag)
-        for name in [ManagedSettingsStore.Name("session"), .nightBlock, .dailyLimit, .always] {
+        // アプリを止めると、そのアプリのサイト（instagram.com）もiOSが止めることがある。
+        // DM画面を出している間だけ、ドパ抜きが使う全ストアの遮断を外す（閉じる・アプリを離れると すぐ戻す）
+        for name in [ManagedSettingsStore.Name("session"), .nightBlock] {
             let store = ManagedSettingsStore(named: name)
+            store.shield.applications = nil
+            store.shield.applicationCategories = nil
             store.shield.webDomains = nil
             store.shield.webDomainCategories = nil
             store.webContent.blockedByFilter = nil
         }
+        // 前のバージョンのストアと、名前なしのストアは もう使わないので ぜんぶ消す
+        ManagedSettingsStore(named: .dailyLimit).clearAllSettings()
+        ManagedSettingsStore(named: .always).clearAllSettings()
+        ManagedSettingsStore().clearAllSettings()
         #endif
     }
 
