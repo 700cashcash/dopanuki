@@ -74,6 +74,7 @@ func renderCard<V: View>(_ view: V) -> Image {
 /// 宣言してから はじめる画面
 struct DeclareView: View {
     @EnvironmentObject var game: GameState
+    @EnvironmentObject var life: LifeState
     @State private var shared = false
     @FocusState private var nameFocus: Bool
 
@@ -101,14 +102,22 @@ struct DeclareView: View {
             .padding(.horizontal, 14).frame(height: 44)
             .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(DP.card))
 
-            DeclareCard(name: displayName, when: when)
-                .scaleEffect(0.92)
-                .shadow(color: DP.purple.opacity(0.6), radius: 24, y: 12)
+            Group {
+                if AppMode.launch {
+                    ShareCard(card: launchCard, name: displayName)
+                        .scaleEffect(0.7)
+                        .frame(width: 224, height: 364)
+                } else {
+                    DeclareCard(name: displayName, when: when)
+                        .scaleEffect(0.92)
+                }
+            }
+            .shadow(color: DP.purple.opacity(0.6), radius: 24, y: 12)
 
             Spacer(minLength: 0)
 
             if shared {
-                Button { game.beginDeclared() } label: { Label("はじめる", systemImage: "play.fill") }
+                Button { begin() } label: { Label("はじめる", systemImage: "play.fill") }
                     .buttonStyle(PuffyStyle(color: .blue, height: 58))
                 ShareLink(item: card, message: Text(shareText), preview: SharePreview("ドパ抜き 宣言", image: card)) {
                     Text("もう一度シェア")
@@ -124,7 +133,7 @@ struct DeclareView: View {
                     // シェア画面からもどったら「はじめる」を押す
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { shared = true }
                 })
-                Button("シェアせずにはじめる") { game.beginDeclared() }
+                Button("シェアせずにはじめる") { begin() }
                     .font(.dp(14, .heavy))
                     .foregroundColor(DP.gray)
             }
@@ -136,7 +145,20 @@ struct DeclareView: View {
         .onTapGesture { nameFocus = false }
     }
 
-    private var card: Image { renderCard(DeclareCard(name: displayName, when: when)) }
+    private var launchCard: SavedCard {
+        SavedCard(kind: .declare, purpose: game.pendingPlan?.purpose ?? "", text: when)
+    }
+
+    private var card: Image {
+        AppMode.launch ? renderCard(ShareCard(card: launchCard, name: displayName))
+                       : renderCard(DeclareCard(name: displayName, when: when))
+    }
+
+    /// 宣言カードを記録にのこして、はじめる
+    private func begin() {
+        if AppMode.launch { life.addCard(launchCard) }
+        game.beginDeclared()
+    }
 
     private var displayName: String {
         let n = game.userName.trimmingCharacters(in: .whitespaces)

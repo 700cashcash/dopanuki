@@ -23,6 +23,11 @@ struct Goal: Identifiable, Codable, Equatable {
     }
 }
 
+/// ローンチ版（ツール＋キャラ）。false にするとプロトタイプ（ゲーム版）の見た目にもどる
+enum AppMode {
+    static let launch = true
+}
+
 struct SessionPlan: Equatable {
     var title: String
     var goalMinutes: Int
@@ -32,6 +37,7 @@ struct SessionPlan: Equatable {
     var declared = false      // 宣言してはじめる
     var forceBase = false     // 夜（あしたの朝まで）は基地なしを選べない
     var cardWhen = ""         // 宣言カードの「いつまで」（例：21:30まで／あしたの朝まで／3日間）
+    var purpose = ""          // 何する？（勉強・読書…。空ならスキップ）
 }
 
 /// ライフが少ないほど、ちょっとだけタイムが短いほど ⭐ がふえる
@@ -49,12 +55,16 @@ func rewardMultiplier(lives: Int, peekMinutes: Int) -> Double {
 }
 
 struct SessionResult: Equatable {
+    var id = UUID()
     var minutes: Int
     var bones: Int
     var stars: Int
     var multiplier: Double = 1
     var baseBonus = false
     var declared = false
+    var purpose = ""
+    var goal = 0
+    var completed = true      // 最後まで置けた（途中でやめたら false）
 }
 
 enum SessionFlow: Equatable {
@@ -86,6 +96,7 @@ final class GameState: ObservableObject {
     @Published var sessionStart: Date? { didSet { Self.ud.set(sessionStart?.timeIntervalSince1970, forKey: "p.sStart") } }
     @Published var sessionTitle: String { didSet { Self.ud.set(sessionTitle, forKey: "p.sTitle") } }
     @Published var sessionGoal: Int { didSet { Self.ud.set(sessionGoal, forKey: "p.sGoal") } }
+    @Published var sessionPurpose: String { didSet { Self.ud.set(sessionPurpose, forKey: "p.sPurpose") } }
     @Published var demoBoost: Double = 0   // デモ用：タイマーを進める秒数
     @Published var lives: Int { didSet { Self.ud.set(lives, forKey: "p.lives") } }
     /// 中断（ライフ−1）で、ブロックを止めている終わりの時刻
@@ -164,6 +175,7 @@ final class GameState: ObservableObject {
         }
         sessionTitle = d.string(forKey: "p.sTitle") ?? "ちょっとだけ"
         sessionGoal = d.object(forKey: "p.sGoal") as? Int ?? 25
+        sessionPurpose = d.string(forKey: "p.sPurpose") ?? ""
         lives = d.object(forKey: "p.lives") as? Int ?? 3
         peekUntil = (d.object(forKey: "p.peek") as? Double).map { Date(timeIntervalSince1970: $0) }
         pausedTotal = d.double(forKey: "p.paused")
@@ -265,6 +277,7 @@ final class GameState: ObservableObject {
         self.atBase = atBase
         sessionTitle = plan.title
         sessionGoal = plan.goalMinutes
+        sessionPurpose = plan.purpose
         sessionStart = Date()
         demoBoost = 0
         maxLives = plan.lives
@@ -281,6 +294,7 @@ final class GameState: ObservableObject {
     func finish() {
         guard sessionStart != nil else { return }
         if peekStart != nil { endPeek() }
+        let completed = sessionGoal <= 0 || elapsed() >= Double(sessionGoal * 60) - 1
         var minutes = Int(elapsed() / 60)
         if sessionGoal > 0 { minutes = min(minutes, sessionGoal) }
         sessionStart = nil
@@ -307,7 +321,8 @@ final class GameState: ObservableObject {
             lastSessionDay = today
         }
         Haptic.success()
-        flow = .result(SessionResult(minutes: minutes, bones: gotBones, stars: gotStars, multiplier: mult, baseBonus: bonus, declared: declaredNow))
+        flow = .result(SessionResult(minutes: minutes, bones: gotBones, stars: gotStars, multiplier: mult, baseBonus: bonus, declared: declaredNow,
+                                     purpose: sessionPurpose, goal: sessionGoal, completed: completed))
     }
 
     /// 中断する：ライフを1つ使って、そのとき決めた分数だけブロックを止める（用途も記録）

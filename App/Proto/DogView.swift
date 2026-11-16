@@ -10,6 +10,9 @@ struct DogPose: Equatable {
     var headTilt: Double = 0     // 首かしげ（度）
     var mouthOpen: CGFloat = 0   // 0〜1
     var eyes: DogMood? = nil     // 目だけ ちがう表情にする
+    var teary = false            // 目うるうる（おかえりの直前）
+    var squash: CGFloat = 0      // むぎゅっ（0〜1）
+    var paw = false              // 「ありがと」の手
 }
 
 /// ドパ抜きちゃん（キャンバスのイラストをそのままSwiftUIで描いたもの）
@@ -19,17 +22,22 @@ struct DogView: View {
     var scarf: Color = DP.blue
     var blinks = true
     var pose = DogPose()
+    /// 夜ふかしした朝の見た目（0 = ツヤツヤ 〜 4 = 四角くなりかけ）
+    var kimo = 0
+    /// おなかの星がちらちら・たまに読み込み中くるくる／目がバグる
+    var alive = false
 
     var body: some View {
         let m = pose.eyes ?? mood
         Group {
-            if m == .normal && blinks {
+            if (m == .normal && blinks) || alive || kimo >= 3 {
                 TimelineView(.animation(minimumInterval: 0.08, paused: false)) { tl in
-                    let t = tl.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 4.2)
-                    DogDrawing(mood: t < 0.14 ? .sleep : .normal, scarf: scarf, pose: pose)
+                    let t = tl.date.timeIntervalSinceReferenceDate
+                    let blink = m == .normal && blinks && t.truncatingRemainder(dividingBy: 4.2) < 0.14
+                    DogDrawing(mood: blink ? .sleep : m, scarf: scarf, pose: pose, kimo: kimo, t: t, alive: alive)
                 }
             } else {
-                DogDrawing(mood: m, scarf: scarf, pose: pose)
+                DogDrawing(mood: m, scarf: scarf, pose: pose, kimo: kimo)
             }
         }
         .frame(width: 120, height: 120)
@@ -43,12 +51,30 @@ private struct DogDrawing: View {
     let mood: DogMood
     let scarf: Color
     var pose = DogPose()
+    var kimo = 0
+    var t: Double? = nil
+    var alive = false
+
+    /// まれに目がバグる（23秒に1回、0.18秒）
+    private var glitching: Bool { alive && (t ?? 0).truncatingRemainder(dividingBy: 23) < 0.18 }
+    /// まれに体に「読み込み中」くるくる（37秒に1回、1.4秒）
+    private var loading: Bool { alive && ((t ?? 0) + 11).truncatingRemainder(dividingBy: 37) < 1.4 }
     private let fur = Color(hex: 0xF2D3A8)
     private let ear = Color(hex: 0xC98B5B)
     private let cream = Color(hex: 0xFFF5E6)
     private let ink = Color(hex: 0x2B1E16)
 
     var body: some View {
+        ZStack {
+            figure
+                .scaleEffect(x: 1 + 0.16 * pose.squash, y: 1 - 0.2 * pose.squash, anchor: .bottom)
+            if loading { spinner(cx: 60, cy: 100, r: 5, color: .white) }
+        }
+        .saturation(kimo >= 3 ? 0.3 : 1)
+        .frame(width: 120, height: 120)
+    }
+
+    private var figure: some View {
         ZStack {
             Path { p in
                 p.move(to: CGPoint(x: 84, y: 98))
@@ -68,6 +94,11 @@ private struct DogDrawing: View {
                 p.closeSubpath()
             }
             .fill(scarf)
+            bellyWindow
+            if pose.paw {
+                oval(78, 86, 6.5, 5, fur, rot: -30)
+                oval(81, 83, 4, 3, cream, rot: -30)
+            }
             head
                 .frame(width: 120, height: 120)
                 .rotationEffect(.degrees(pose.headTilt), anchor: UnitPoint(x: 0.5, y: 80.0 / 120))
@@ -80,11 +111,36 @@ private struct DogDrawing: View {
         return ZStack {
             oval(29, pose.earsUp ? 44 : 50, 12, 21, ear, rot: 25 + earRot)
             oval(91, pose.earsUp ? 44 : 50, 12, 21, ear, rot: -25 - earRot)
-            oval(60, 52, 34, 31, fur)
+            if kimo >= 2 {
+                // ねぐせ（ぼさぼさ）
+                Path { p in
+                    for x in [CGFloat(48), 58, 68] {
+                        p.move(to: CGPoint(x: x - 5, y: 26))
+                        p.addLine(to: CGPoint(x: x, y: 13))
+                        p.addLine(to: CGPoint(x: x + 5, y: 26))
+                    }
+                }
+                .fill(fur)
+            }
+            if kimo >= 4 {
+                RoundedRectangle(cornerRadius: 14, style: .continuous).fill(fur)
+                    .frame(width: 66, height: 70).position(x: 60, y: 50)
+            } else {
+                oval(60, 52, 34, 31, fur)
+            }
             oval(60, 65, 16, 11, cream)
             oval(40, 63, 5.5, 3.2, Color(hex: 0xFF9AA2).opacity(0.6))
             oval(80, 63, 5.5, 3.2, Color(hex: 0xFF9AA2).opacity(0.6))
+            if kimo >= 1 {
+                // クマ
+                oval(46, 59, 6, 2.2, Color(hex: 0x6B4E8C).opacity(kimo >= 2 ? 0.55 : 0.25))
+                oval(74, 59, 6, 2.2, Color(hex: 0x6B4E8C).opacity(kimo >= 2 ? 0.55 : 0.25))
+            }
             eyes
+                .offset(x: glitching ? 2.5 : 0)
+            if glitching {
+                eyes.offset(x: -3).opacity(0.6).colorMultiply(Color(hex: 0x00E5FF))
+            }
             oval(60, 60, 4.6, 3.3, ink)
             Path { p in
                 p.move(to: CGPoint(x: 60, y: 63))
@@ -101,14 +157,60 @@ private struct DogDrawing: View {
         }
     }
 
+    /// おなかの小さな窓（中で星がちらちら）
+    private var bellyWindow: some View {
+        let tt = t ?? 0
+        return ZStack {
+            oval(60, 102, 7.5, 6, Color(hex: 0x1B1F5C))
+            ForEach(0..<3, id: \.self) { i in
+                let tw = 0.45 + 0.55 * abs(sin(tt * (1.3 + Double(i) * 0.7) + Double(i)))
+                oval([56.5, 61.5, 59][i], [100.5, 101.5, 104.5][i], [0.9, 1.2, 0.7][i], [0.9, 1.2, 0.7][i],
+                     Color(hex: [0xFFF6B0, 0xFFFFFF, 0xBFE3FF][i]).opacity(t == nil ? 0.9 : tw))
+            }
+        }
+    }
+
+    /// 読み込み中のくるくる
+    private func spinner(cx: CGFloat, cy: CGFloat, r: CGFloat, color: Color) -> some View {
+        Circle()
+            .trim(from: 0, to: 0.7)
+            .stroke(color, style: StrokeStyle(lineWidth: max(1.2, r * 0.35), lineCap: .round))
+            .frame(width: r * 2, height: r * 2)
+            .rotationEffect(.degrees((t ?? 0) * 400))
+            .position(x: cx, y: cy)
+    }
+
     @ViewBuilder private var eyes: some View {
+        if kimo >= 3 && mood != .sleep {
+            ZStack {
+                oval(46, 52, 5.2, 5.2, Color(hex: 0x3A3A3A))
+                oval(74, 52, 5.2, 5.2, Color(hex: 0x3A3A3A))
+                spinner(cx: 46, cy: 52, r: 3.2, color: .white)
+                spinner(cx: 74, cy: 52, r: 3.2, color: .white)
+            }
+        } else {
+            plainEyes
+        }
+    }
+
+    @ViewBuilder private var plainEyes: some View {
         switch mood {
         case .normal:
             ZStack {
-                oval(46, 52, 5.2, 5.2, ink)
-                oval(74, 52, 5.2, 5.2, ink)
-                oval(47.9, 50.1, 1.7, 1.7, .white)
-                oval(75.9, 50.1, 1.7, 1.7, .white)
+                if kimo == 2 {
+                    oval(46, 52, 6.4, 6.4, Color(hex: 0xFFB3B3))
+                    oval(74, 52, 6.4, 6.4, Color(hex: 0xFFB3B3))
+                }
+                oval(46, 52, pose.teary ? 6.2 : 5.2, pose.teary ? 6.2 : 5.2, ink)
+                oval(74, 52, pose.teary ? 6.2 : 5.2, pose.teary ? 6.2 : 5.2, ink)
+                oval(47.9, 50.1, pose.teary ? 2.3 : 1.7, pose.teary ? 2.3 : 1.7, .white)
+                oval(75.9, 50.1, pose.teary ? 2.3 : 1.7, pose.teary ? 2.3 : 1.7, .white)
+                if pose.teary {
+                    oval(44.5, 54.5, 1, 1, .white)
+                    oval(72.5, 54.5, 1, 1, .white)
+                    oval(46, 57.5, 5, 1.2, Color(hex: 0x8FD3FF).opacity(0.85))
+                    oval(74, 57.5, 5, 1.2, Color(hex: 0x8FD3FF).opacity(0.85))
+                }
             }
         case .happy:
             Path { p in

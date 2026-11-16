@@ -85,8 +85,10 @@ enum NightLock {
             Blocker.unblock(.nightBlock)
             return
         }
+        let eventsVersion = "v1-\(start)-\(end)"
         if let cur = center.schedule(for: .night),
-           cur.intervalStart.hour == start, cur.intervalEnd.hour == end {
+           cur.intervalStart.hour == start, cur.intervalEnd.hour == end,
+           UserDefaults.standard.string(forKey: "p.nightEvents") == eventsVersion {
             if UserDefaults.standard.object(forKey: "p.nightArmed") == nil {
                 UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: "p.nightArmed")
             }
@@ -97,8 +99,17 @@ enum NightLock {
             intervalEnd: DateComponents(hour: end, minute: 0),
             repeats: true
         )
+        // 夜ふかし計測：寝る時間のあとに 選んだアプリを使った分数（5/30/60/120分）
+        let s = SharedSettings.selection
+        var events: [DeviceActivityEvent.Name: DeviceActivityEvent] = [:]
+        for m in NightUsage.thresholds {
+            events[NightUsage.eventName(m)] = DeviceActivityEvent(
+                applications: s.applicationTokens, categories: s.categoryTokens, webDomains: s.webDomainTokens,
+                threshold: DateComponents(minute: m))
+        }
         do {
-            try center.startMonitoring(.night, during: night)
+            try center.startMonitoring(.night, during: night, events: events)
+            UserDefaults.standard.set(eventsVersion, forKey: "p.nightEvents")
             UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: "p.nightArmed")
         } catch {
             print("night lock:", error)
