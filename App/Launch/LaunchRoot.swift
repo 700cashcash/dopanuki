@@ -40,11 +40,18 @@ struct LaunchRoot: View {
             OpeningView { replayOpening = false }
         }
         .onChange(of: scenePhase) { phase in
-            if phase == .active { refresh() }
+            if phase == .active {
+                refresh()
+                if DMGate.visible { DMGate.open() }      // DMを開いたまま戻ってきた
+            } else if phase == .background {
+                BowlPlayer.shared.stopAll(fade: 0.3)
+                DMGate.close()                           // DMを開いたままアプリを離れたら、遮断をもどす
+            }
         }
-        .onReceive(Timer.publish(every: 30, on: .main, in: .common).autoconnect()) { game.clock = $0 }
+        .onReceive(Timer.publish(every: 30, on: .main, in: .common).autoconnect()) { game.clock = $0; updateBGM() }
         .onChange(of: game.nightBaseKey) { k in if !k.isEmpty { life.countSleep(nightKey: k) } }
         .onAppear {
+            DMGate.close()   // 前回DMを開いたまま落ちていたら、遮断をもどす
             refresh()
             #if DEBUG
             let d = UserDefaults.standard
@@ -94,7 +101,18 @@ struct LaunchRoot: View {
         }
     }
 
+    /// BGM：おやすみロック中（部屋が消灯）は止める
+    private func updateBGM() {
+        let locked = NightLock.isSleepTime(game.clock) && game.nightBaseKey == NightLock.nightKey(game.clock)
+        if locked {
+            if BowlPlayer.shared.mode == .ambient { BowlPlayer.shared.stopAll(fade: 3) }
+        } else if BowlPlayer.shared.mode == .off {
+            BowlPlayer.shared.startAmbient()
+        }
+    }
+
     private func refresh() {
+        defer { updateBGM() }
         game.checkNight()
         game.nightToast = nil   // ローンチ版は朝のあいさつで伝える
         game.clock = Date()
@@ -155,7 +173,7 @@ struct LaunchFriendsView: View {
         }
         .padding(.horizontal, 20)
         .background(TopGlow(color: Color(hex: 0x1E9E5E).opacity(0.6), reach: 0.35))
-        .sheet(isPresented: $showDM) { SafariView(url: InstagramDM.url) }
+        .sheet(isPresented: $showDM) { InstagramDMView() }
     }
 }
 
@@ -170,6 +188,7 @@ struct LaunchSettingsView: View {
     @State private var bed = SharedSettings.nightStartHour
     @State private var wake = SharedSettings.nightEndHour
     @State private var devTaps = 0
+    @State private var bgm = BowlPlayer.shared.bgmEnabled
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -201,6 +220,18 @@ struct LaunchSettingsView: View {
                 section("なまえ") {
                     field("ドパ抜きちゃんの なまえ", $game.dogName)
                     field("カードに出る自分の なまえ", $game.userName)
+                }
+
+                section("音") {
+                    Toggle(isOn: Binding(get: { bgm }, set: { bgm = $0; BowlPlayer.shared.bgmEnabled = $0; Haptic.select() })) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("BGM（クリスタルボウル）").font(.dp(15, .heavy))
+                            Text("マナーモードのときは鳴らないよ").font(.dp(12, .bold)).foregroundColor(DP.gray)
+                        }
+                    }
+                    .tint(DP.violet)
+                    .padding(14)
+                    .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(DP.card))
                 }
 
                 section("インスタ") {
@@ -240,7 +271,7 @@ struct LaunchSettingsView: View {
         .background(DP.bg.ignoresSafeArea())
         .preferredColorScheme(.dark)
         .sheet(isPresented: $showApps) { BlockSettingsView() }
-        .sheet(isPresented: $showDM) { SafariView(url: InstagramDM.url) }
+        .sheet(isPresented: $showDM) { InstagramDMView() }
         .onAppear {
             #if DEBUG
             if UserDefaults.standard.bool(forKey: "debugDev") { devTaps = 5 }

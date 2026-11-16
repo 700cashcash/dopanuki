@@ -80,7 +80,7 @@ struct FriendsView: View {
             .padding(.bottom, 24)
         }
         .background(TopGlow(color: Color(hex: 0x1E9E5E).opacity(0.6), reach: 0.35))
-        .sheet(isPresented: $showDM) { SafariView(url: InstagramDM.url) }
+        .sheet(isPresented: $showDM) { InstagramDMView() }
         .onAppear {
             steps.refresh()
             #if DEBUG

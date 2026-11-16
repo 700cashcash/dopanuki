@@ -10,12 +10,16 @@ struct BreathView: View {
     @State private var startedAt: Date?
     @State private var finished = false
     @State private var lastHapticStep = -1
+    @State private var lastCycle = -1
+    @State private var soundOn = BowlPlayer.shared.enabled
     @State private var page = 0
     @State private var showRoad = false
     @State private var unlocked: [RoadReward] = []
 
     private let lengths = [1, 3, 5, 10]
-    private let cycle: Double = 8
+    /// 呼吸法（ローンチは 4秒すう・4秒はく の1種）
+    private let pattern = BreathPattern.current
+    private var cycle: Double { pattern.cycle }
     private let ticker = Timer.publish(every: 0.25, on: .main, in: .common).autoconnect()
 
     private var total: Double { Double(lengths[lengthIndex] * 60) }
@@ -30,6 +34,15 @@ struct BreathView: View {
         .overlay { if !unlocked.isEmpty { unlockCelebration } }
         .preferredColorScheme(.dark)
         .onReceive(ticker) { now in tick(now) }
+        .onDisappear { if startedAt != nil { BowlPlayer.shared.stop() } }
+        #if DEBUG
+        .onAppear {
+            if UserDefaults.standard.bool(forKey: "debugBreathStart") && startedAt == nil {
+                lastHapticStep = -1; lastCycle = 0; startedAt = Date(); BowlPlayer.shared.begin()
+                print("bowl: engine started")
+            }
+        }
+        #endif
         .sheet(isPresented: $showRoad) { RoadView().environmentObject(game) }
         #if DEBUG
         .onAppear { if UserDefaults.standard.bool(forKey: "debugRoad") { game.breathMinutes = max(game.breathMinutes, 16); showRoad = true } }
@@ -162,9 +175,10 @@ struct BreathView: View {
     private func stage(now: Date) -> some View {
         let t = startedAt.map { now.timeIntervalSince($0) } ?? 0
         let inCycle = t.truncatingRemainder(dividingBy: cycle)
-        let inhale = inCycle < cycle / 2
+        let phase = pattern.phase(at: inCycle)
+        let inhale = phase.kind == .inhale
         // 0.78 → 1 → 0.78（なめらか）
-        let wave = startedAt == nil ? 0.5 : (1 - cos(inCycle / cycle * 2 * .pi)) / 2
+        let wave = startedAt == nil ? 0.5 : pattern.fullness(at: inCycle)
         let scale = 0.78 + 0.22 * wave
         let remain = max(0, total - t)
 
@@ -174,6 +188,15 @@ struct BreathView: View {
                     Button { dismiss() } label: { CircleIcon(system: "xmark") }.buttonStyle(PressStyle())
                 }
                 Spacer()
+                // ボウルの音 ON/OFF
+                Button {
+                    soundOn.toggle()
+                    BowlPlayer.shared.enabled = soundOn
+                    Haptic.select()
+                    if soundOn && startedAt != nil { BowlPlayer.shared.begin() }
+                } label: { CircleIcon(system: soundOn ? "speaker.wave.2.fill" : "speaker.slash.fill") }
+                    .buttonStyle(PressStyle())
+                    .accessibilityLabel(Text(soundOn ? "音を消す" : "音を出す"))
             }
             .frame(height: 44)
             .padding(.horizontal, 20)
@@ -213,7 +236,7 @@ struct BreathView: View {
                 Circle()
                     .strokeBorder(Color.white.opacity(0.35), lineWidth: 1.5)
                     .frame(width: 330, height: 330)
-                    .scaleEffect(CGFloat(0.78 + 0.22 * (startedAt == nil ? 0.5 : (1 - cos((inCycle - 0.4) / cycle * 2 * .pi)) / 2)))
+                    .scaleEffect(CGFloat(0.78 + 0.22 * (startedAt == nil ? 0.5 : pattern.fullness(at: max(0, inCycle - 0.4)))))
                 VStack(spacing: 6) {
                     DogView(size: 104, mood: finished ? .happy : (startedAt == nil ? .normal : .sleep))
                         .offset(y: -6 * CGFloat(wave))
@@ -222,7 +245,7 @@ struct BreathView: View {
                         if !AppMode.launch { Text("+10 ⭐").font(.dp(14, .heavy)).foregroundColor(DP.yellow) }
                     } else if startedAt != nil {
                         Text(clock(remain)).font(.num(40))
-                        Text(inhale ? "すって…" : "はいて…").font(.dp(15, .bold)).foregroundColor(Color(hex: 0xD8D2FF))
+                        Text(phase.kind.label).font(.dp(15, .bold)).foregroundColor(Color(hex: 0xD8D2FF))
                     } else {
                         Text("\(lengths[lengthIndex])分").font(.num(40))
                         Text("いっしょに深呼吸しよ？").font(.dp(14, .bold)).foregroundColor(Color(hex: 0xD8D2FF))
@@ -248,7 +271,9 @@ struct BreathView: View {
                     Button {
                         finished = false
                         lastHapticStep = -1
+                        lastCycle = 0
                         startedAt = Date()
+                        BowlPlayer.shared.begin()
                     } label: {
                         Label("いっしょに深呼吸", systemImage: "play.fill")
                     }
@@ -261,6 +286,7 @@ struct BreathView: View {
                     Button {
                         if let s = startedAt { record(Date().timeIntervalSince(s)) }
                         startedAt = nil
+                        BowlPlayer.shared.stop()
                     } label: { Image(systemName: "pause.fill").font(.system(size: 24, weight: .heavy)) }
                         .buttonStyle(PuffyStyle(color: .black, height: 72, circle: true))
                         .accessibilityLabel(Text("おわる"))
@@ -277,20 +303,23 @@ struct BreathView: View {
         if t >= total {
             startedAt = nil
             finished = true
+            BowlPlayer.shared.finish()
             game.stars += 10
             record(total)
             Haptic.success()
             return
         }
+        // すうはじめに、やさしくボウル
+        let c = Int(t / cycle)
+        if c != lastCycle { lastCycle = c; BowlPlayer.shared.strike(volume: 0.55) }
         let step = Int(t / 0.25)
         guard step != lastHapticStep else { return }
         lastHapticStep = step
-        let inCycle = t.truncatingRemainder(dividingBy: cycle)
-        let half = cycle / 2
-        if inCycle < half {
-            Haptic.soft(CGFloat(0.25 + 0.75 * inCycle / half))
-        } else if step % 2 == 0 {
-            Haptic.soft(CGFloat(max(0.15, 1 - (inCycle - half) / half)))
+        let ph = pattern.phase(at: t.truncatingRemainder(dividingBy: cycle))
+        switch ph.kind {
+        case .inhale: Haptic.soft(CGFloat(0.25 + 0.75 * ph.progress))
+        case .exhale: if step % 2 == 0 { Haptic.soft(CGFloat(max(0.15, 1 - ph.progress))) }
+        case .holdIn, .holdOut: break
         }
     }
 
@@ -300,3 +329,51 @@ struct BreathView: View {
     }
 }
 
+
+/// 呼吸法（アップデートで ここに足していく）。秒数から、文字・丸の大きさ・振動・音のタイミングを計算する
+struct BreathPattern: Identifiable {
+    enum Kind {
+        case inhale, holdIn, exhale, holdOut
+        var label: String {
+            switch self {
+            case .inhale: return "すって…"
+            case .holdIn, .holdOut: return "とめて…"
+            case .exhale: return "はいて…"
+            }
+        }
+    }
+    let id: String
+    let name: String
+    let inhale: Double
+    let holdIn: Double
+    let exhale: Double
+    let holdOut: Double
+
+    var cycle: Double { inhale + holdIn + exhale + holdOut }
+
+    static let simple = BreathPattern(id: "4-4", name: "4秒すって 4秒はく", inhale: 4, holdIn: 0, exhale: 4, holdOut: 0)
+    static let all: [BreathPattern] = [simple]
+    static var current: BreathPattern { simple }
+
+    /// サイクルの中のどこか（progress は その段階の 0〜1）
+    func phase(at x: Double) -> (kind: Kind, progress: Double) {
+        var r = x
+        for (k, d) in [(Kind.inhale, inhale), (.holdIn, holdIn), (.exhale, exhale), (.holdOut, holdOut)] where d > 0 {
+            if r < d { return (k, r / d) }
+            r -= d
+        }
+        return (.holdOut, 1)
+    }
+
+    /// 丸のふくらみ（0〜1、なめらか）
+    func fullness(at x: Double) -> Double {
+        let p = phase(at: x)
+        let ease = (1 - cos(p.progress * .pi)) / 2
+        switch p.kind {
+        case .inhale: return ease
+        case .holdIn: return 1
+        case .exhale: return 1 - ease
+        case .holdOut: return 0
+        }
+    }
+}

@@ -602,7 +602,7 @@ struct SessionRunView: View {
         .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { now in game.tick(now) }
         .background(TopGlow(color: Color(hex: 0x3B2FA0), reach: 0.55))
         .sheet(isPresented: $showBreath) { BreathView(compact: true).environmentObject(game) }
-        .sheet(isPresented: $showDM) { SafariView(url: InstagramDM.url) }
+        .sheet(isPresented: $showDM) { InstagramDMView() }
         #if DEBUG
         .onAppear { if UserDefaults.standard.bool(forKey: "debugPeekSheet") { askEnd = true } }
         #endif

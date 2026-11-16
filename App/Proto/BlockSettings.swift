@@ -1,5 +1,6 @@
 import SwiftUI
 import FamilyControls
+import ManagedSettings
 
 /// 設定：ブロックするアプリをえらぶ（セッション中・おやすみロックで使う）
 struct BlockSettingsView: View {
@@ -100,7 +101,7 @@ struct BlockSettingsView: View {
             NightLock.apply()
             Haptic.success()
         }
-        .sheet(isPresented: $showDM) { SafariView(url: InstagramDM.url) }
+        .sheet(isPresented: $showDM) { InstagramDMView() }
     }
 
     private func step<Trailing: View>(_ n: Int, done: Bool, title: String, sub: String,
@@ -134,4 +135,43 @@ struct BlockSettingsView: View {
 /// インスタのDM（ブラウザ版）。アプリをブロックしていても開ける
 enum InstagramDM {
     static let url = URL(string: "https://www.instagram.com/direct/inbox/")!
+}
+
+/// DMを開いている間だけ、サイト（webDomains / webDomainCategories）の遮断を外す。アプリの遮断はそのまま
+enum DMGate {
+    private static let flag = "p.dmOpen"
+    /// いまDM画面が出ているか（アプリに戻ってきたとき、また外すため）
+    static var visible = false
+
+    static func open() {
+        visible = true
+        #if !DEMO
+        UserDefaults.standard.set(true, forKey: flag)
+        for name in [ManagedSettingsStore.Name("session"), .nightBlock, .dailyLimit, .always] {
+            let store = ManagedSettingsStore(named: name)
+            store.shield.webDomains = nil
+            store.shield.webDomainCategories = nil
+        }
+        #endif
+    }
+
+    /// DMを閉じた・アプリを離れた・起動したとき：もとに戻す
+    static func close() {
+        #if !DEMO
+        guard UserDefaults.standard.bool(forKey: flag) else { return }
+        UserDefaults.standard.set(false, forKey: flag)
+        if UserDefaults.standard.object(forKey: "p.sStart") != nil { SessionShield.on() }
+        if SharedSettings.nightBlockEnabled && NightLock.isReady && NightLock.isSleepTime() { Blocker.block(.nightBlock) }
+        #endif
+    }
+}
+
+/// DM画面（開いている間だけサイトの遮断を外す）
+struct InstagramDMView: View {
+    var body: some View {
+        SafariView(url: InstagramDM.url)
+            .ignoresSafeArea()
+            .onAppear { DMGate.open() }
+            .onDisappear { DMGate.visible = false; DMGate.close() }
+    }
 }

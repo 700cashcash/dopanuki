@@ -25,6 +25,7 @@
 		2F20960B47852D33B626CE6A /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF7935B5DDEBA574FEB7439 /* GameState.swift */; };
 		2F66D1C44F0BFFF7903A1D6F /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3686D3652DFEA9879F1C9454 /* Theme.swift */; };
 		334D110DD15B6BBF0D344F88 /* Declare.swift in Sources */ = {isa = PBXBuildFile; fileRef = A39C130ABBA286C99DFB230F /* Declare.swift */; };
+		33B809AE44630E65EFFD3F12 /* Bowl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C716C04585E4910B325E5E99 /* Bowl.swift */; };
 		34EF616252B5166E32C0C87C /* ReportExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 87EDA0B15179E03276C09288 /* ReportExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		354E7D5DC36235DCD30F46B6 /* SharedSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAB83050EB68D761E4D7A74 /* SharedSettings.swift */; };
 		3895878EBDB9B23E3BCD31AF /* ContentBlockerRequestHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8193F7F91F9D3BC7E918CFE1 /* ContentBlockerRequestHandler.swift */; };
@@ -72,6 +73,7 @@
 		BA21AEF679EE2B37220F2AAA /* DetoxTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA7E13E773F5EDE848EB0D1 /* DetoxTips.swift */; };
 		C2E03EC39E310B6778C7487F /* GoalExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3525CC70F9C803463039B616 /* GoalExtras.swift */; };
 		C3225DBE67B82C7572B03349 /* FriendsGoalsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADD2137EF0DF93E0AAA10332 /* FriendsGoalsViews.swift */; };
+		C7D2E34DA72865CFED8F338F /* Bowl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C716C04585E4910B325E5E99 /* Bowl.swift */; };
 		C8C773B7766B43584A0DA718 /* LaunchRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507E6DCCCCD1218F1C73FA1F /* LaunchRoot.swift */; };
 		CA1EB7638CBD3FB9CFAA6CF0 /* ContentBlocker.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 756EF7C3AF84562967489D78 /* ContentBlocker.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CCCDB1ED1EDD46E4E782D16F /* Talk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F9A76AA93F6D219EEDA9141 /* Talk.swift */; };
@@ -182,6 +184,7 @@
 		B3F3CEDA732D84417BD4730A /* Scenes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scenes.swift; sourceTree = "<group>"; };
 		C2CFCD1A4F56F9A572C43919 /* ReportExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ReportExtension.entitlements; sourceTree = "<group>"; };
 		C5FBEF63F2B7F435DBC07F7C /* ShieldExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShieldExtension.entitlements; sourceTree = "<group>"; };
+		C716C04585E4910B325E5E99 /* Bowl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bowl.swift; sourceTree = "<group>"; };
 		C744D7A2B72F420EBB29B489 /* SNSLimiter.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SNSLimiter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA6064C710543220F26D43F9 /* SNSLimiterDemo.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SNSLimiterDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D560EB2A640966B2047C0232 /* ShieldExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldExtension.swift; sourceTree = "<group>"; };
@@ -234,6 +237,7 @@
 		67336204FCEE4CE3BF753D4D /* Launch */ = {
 			isa = PBXGroup;
 			children = (
+				C716C04585E4910B325E5E99 /* Bowl.swift */,
 				49DAA652704CD28DBF39021E /* Cards.swift */,
 				711553192C5FC2B3ACE41A0F /* LaunchPick.swift */,
 				D7A8C24A49DD00C6209D6E69 /* LaunchRecord.swift */,
@@ -543,6 +547,7 @@
 			files = (
 				071F66D364036EA1F11D6D50 /* Alternatives.swift in Sources */,
 				9DD8643FB3DFCA8A67F6667C /* BlockSettings.swift in Sources */,
+				C7D2E34DA72865CFED8F338F /* Bowl.swift in Sources */,
 				B400732234E696B58F2C5A45 /* BreathView.swift in Sources */,
 				994948DDBD9F82D7ED667DD3 /* Cards.swift in Sources */,
 				4D998085B246E1B44B592B25 /* ContentView.swift in Sources */,
@@ -599,6 +604,7 @@
 			files = (
 				03C1B41A570C976DCC9B8132 /* Alternatives.swift in Sources */,
 				41C85CD003CE11379D15CC7D /* BlockSettings.swift in Sources */,
+				33B809AE44630E65EFFD3F12 /* Bowl.swift in Sources */,
 				D59F109411F671DD4A4FD321 /* BreathView.swift in Sources */,
 				40FA4D292FEE84C848F56E14 /* Cards.swift in Sources */,
 				915052DDDBAC7F6F0023E6E2 /* ContentView.swift in Sources */,
