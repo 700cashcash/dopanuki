@@ -70,9 +70,9 @@ struct OpeningView: View {
 
                 // 6：セリフ
                 VStack(spacing: 10) {
-                    if t > 17.2 { Bubble(text: "…んま？").transition(.opacity) }
-                    if t > 18.4 { Bubble(text: "たすけてくれて、ありがと").transition(.opacity) }
-                    if t > 19.6 { Bubble(text: "いっしょに取り戻そ").transition(.opacity) }
+                    if t > 17.2 { say("…んま？") }
+                    if t > 18.4 { say("たすけてくれて、ありがと") }
+                    if t > 19.6 { say("いっしょに取り戻そ") }
                 }
                 .position(x: w / 2, y: h * 0.18)
                 .animation(.easeOut(duration: 0.3), value: Int(t * 2))
@@ -89,6 +89,13 @@ struct OpeningView: View {
                 }
             }
         }
+    }
+
+    private func say(_ s: String) -> some View {
+        Text(s).font(.dp(16, .heavy)).foregroundColor(.black)
+            .padding(.horizontal, 16).padding(.vertical, 10)
+            .background(RoundedRectangle(cornerRadius: 18, style: .continuous).fill(Color.white))
+            .transition(.scale(scale: 0.7).combined(with: .opacity))
     }
 
     private func stars(w: CGFloat, h: CGFloat, t: Double) -> some View {
@@ -153,7 +160,7 @@ struct OpeningView: View {
                     .scaleEffect(CGFloat(1 + 0.6 * abs(sin((t - 11) * 4))))
                     .offset(y: 30)
             }
-            DogView(size: 170, mood: t > 16.3 ? (t > 18.4 ? .happy : .normal) : .sleep, blinks: false,
+            DogView(size: 170, mood: t > 16.3 ? (t > 18.4 ? .happy : .normal) : (t < 11 ? .normal : .sleep), blinks: false,
                     pose: DogPose(headTilt: crawl > 0 && crawl < 1 ? -8 : 0, mouthOpen: t > 17.2 && t < 17.8 ? 0.6 : 0,
                                   squash: pop ? 0.4 : 0, paw: t > 19.6),
                     kimo: gray ? 3 : 0)

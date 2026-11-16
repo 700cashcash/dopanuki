@@ -15,6 +15,11 @@ struct LaunchRoot: View {
     @State private var tab: LaunchTab = .room
     @State private var replayOpening = false
     @State private var chatDone = false
+    #if DEBUG
+    private var debugBedChat: Bool { UserDefaults.standard.bool(forKey: "debugBedChat") && !chatDone }
+    #else
+    private let debugBedChat = false
+    #endif
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
@@ -55,6 +60,11 @@ struct LaunchRoot: View {
                 game.flow = .result(SessionResult(minutes: d.integer(forKey: "debugWelcomeMin") == 0 ? 40 : d.integer(forKey: "debugWelcomeMin"),
                                                   bones: 0, stars: 0, purpose: "英単語", goal: 40, completed: !d.bool(forKey: "debugQuit")))
             }
+            if d.bool(forKey: "debugDeclare") && game.flow == nil {
+                var p = SessionPlan(title: "40分", goalMinutes: 40, lives: 99, peekMinutes: 5, useBase: false)
+                p.purpose = "英単語"; p.declared = true; p.cardWhen = "21:30まで"
+                game.start(p)
+            }
             if d.bool(forKey: "debugIcon") { IconExport.run() }
             #endif
         }
@@ -74,7 +84,7 @@ struct LaunchRoot: View {
         .background(DP.bg.ignoresSafeArea())
         // おやすみ：寝る前のおしゃべり → 基地につなぐまで すすめない
         .overlay {
-            if game.needsNightBase {
+            if game.needsNightBase || debugBedChat {
                 if !chatDone && life.data.planDay != LifeState.today() {
                     BedtimeChatView { chatDone = true }.transition(.opacity)
                 } else {

@@ -22,7 +22,14 @@ struct WelcomeBackView: View {
             if phase < 3 { reaction } else { resultCard.transition(.move(edge: .bottom).combined(with: .opacity)) }
         }
         .animation(.spring(response: 0.45, dampingFraction: 0.8), value: phase)
-        .onAppear(perform: play)
+        .onAppear {
+            play()
+            #if DEBUG
+            if UserDefaults.standard.bool(forKey: "debugWelcomeCard") {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { phase = 3 }
+            }
+            #endif
+        }
     }
 
     // MARK: リアクション

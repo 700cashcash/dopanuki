@@ -14,7 +14,12 @@ struct LaunchRoomView: View {
     @State private var quizAnswer: Int?
     @State private var lineToken = 0
 
-    private var hour: Int { Calendar.current.component(.hour, from: game.clock) }
+    private var hour: Int {
+        #if DEBUG
+        if UserDefaults.standard.object(forKey: "debugHour") != nil { return UserDefaults.standard.integer(forKey: "debugHour") }
+        #endif
+        return Calendar.current.component(.hour, from: game.clock)
+    }
     /// おやすみロック中（基地につないで ねてる）
     private var locked: Bool {
         #if DEBUG
@@ -47,7 +52,20 @@ struct LaunchRoomView: View {
         .padding(.top, 8)
         .background(TopGlow(color: tint.opacity(locked ? 0.2 : 0.55), reach: 0.45))
         .sheet(isPresented: $showSettings) { LaunchSettingsView().environmentObject(game).environmentObject(life) }
-        .onAppear(perform: arrive)
+        .onAppear {
+            arrive()
+            #if DEBUG
+            let d = UserDefaults.standard
+            if d.bool(forKey: "debugSettings") { showSettings = true }
+            switch d.string(forKey: "debugNeenee") {
+            case "morning": life.neenee = .morning
+            case "plan": life.neenee = .yesterdayPlan("英単語")
+            case "quiz": life.neenee = .quiz(Quiz.all[2])
+            default: break
+            }
+            if let s = d.string(forKey: "debugLine") { line = s }
+            #endif
+        }
     }
 
     // MARK: 上：きょうの目標・取り戻した時間・歯車
@@ -103,7 +121,7 @@ struct LaunchRoomView: View {
                 Ellipse().fill((locked ? DP.violet : DP.pink).opacity(0.5)).frame(width: 200, height: 46).position(x: cx, y: geo.size.height - 70)
 
                 // ドパ抜きちゃん
-                DogView(size: 190, mood: locked ? .sleep : (squish || line != nil ? .happy : .normal),
+                DogView(size: 190, mood: locked ? .sleep : (squish || (line != nil && life.kimo == 0) ? .happy : .normal),
                         pose: DogPose(squash: squish ? 0.7 : 0), kimo: locked ? 0 : life.kimo, alive: !locked)
                     .bob(locked ? 2 : 4, period: locked ? 3.4 : 2.8)
                     .contentShape(Rectangle())
