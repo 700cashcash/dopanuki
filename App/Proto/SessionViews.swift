@@ -588,6 +588,7 @@ struct BaseView: View {
 
 struct SessionRunView: View {
     @EnvironmentObject var game: GameState
+    @EnvironmentObject var life: LifeState
     @State private var showBreath = false
     @State private var showDM = false
     @State private var askEnd = false
@@ -764,13 +765,8 @@ struct SessionRunView: View {
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
             if AppMode.launch && peekLeft == nil {
-                Button("ここまでにする") { quit = true }
-                    .font(.dp(12, .heavy)).foregroundColor(DP.gray)
+                HoldToEndButton { game.finish() }
                     .frame(maxWidth: .infinity)
-                    .alert("ここまでにする？", isPresented: $quit) {
-                        Button("おわる") { game.finish() }
-                        Button("もうすこし", role: .cancel) {}
-                    } message: { Text("ここまでの時間は、ちゃんと記録するよ") }
             }
         }
         .padding(.horizontal, 24)
@@ -788,8 +784,12 @@ struct SessionRunView: View {
             .disabled(peeking)
             .opacity(peeking ? 0.5 : 1)
             .sheet(isPresented: $askEnd) {
-                PeekSheet().environmentObject(game)
-                    .presentationDetents([.large])
+                if AppMode.launch {
+                    PreOpenView(origin: .session).environmentObject(game).environmentObject(life)
+                } else {
+                    PeekSheet().environmentObject(game)
+                        .presentationDetents([.large])
+                }
             }
         } else {
             Button { askEnd = true } label: {
@@ -959,5 +959,41 @@ struct ResultView: View {
         .fixedSize()
         .padding(.horizontal, 12).frame(height: 30)
         .background(Capsule().fill(Color.white.opacity(0.12)))
+    }
+}
+
+/// 「おわる」は2秒長押し（リングが一周したら終わる）。ふつうのタップでは終わらない
+struct HoldToEndButton: View {
+    var onEnd: () -> Void
+    @State private var holding = false
+    @State private var hint = false
+
+    var body: some View {
+        VStack(spacing: 4) {
+            ZStack {
+                Circle().stroke(Color.white.opacity(0.15), lineWidth: 3).frame(width: 52, height: 52)
+                Circle()
+                    .trim(from: 0, to: holding ? 1 : 0)
+                    .stroke(DP.yellow, style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                    .frame(width: 52, height: 52)
+                    .animation(holding ? .linear(duration: 2) : .easeOut(duration: 0.2), value: holding)
+                Image(systemName: "flag.checkered").font(.system(size: 16, weight: .heavy))
+                    .frame(width: 44, height: 44)
+                    .background(Circle().fill(Color.white.opacity(holding ? 0.2 : 0.1)))
+                    .scaleEffect(holding ? 0.92 : 1)
+            }
+            .onLongPressGesture(minimumDuration: 2, maximumDistance: 40, perform: {
+                holding = false
+                Haptic.success()
+                onEnd()
+            }, onPressingChanged: { p in
+                holding = p
+                if p { Haptic.medium(); hint = false }
+            })
+            .simultaneousGesture(TapGesture().onEnded { hint = true; Haptic.light() })
+            Text(hint ? "長押しで おわる" : "おわる（長押し）").font(.dp(11, .heavy)).foregroundColor(hint ? DP.yellow : DP.gray)
+        }
+        .accessibilityLabel(Text("2秒長押しで おわる"))
     }
 }

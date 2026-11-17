@@ -148,17 +148,8 @@ enum DMGate {
         #if !DEMO
         UserDefaults.standard.set(true, forKey: flag)
         // アプリを止めると、そのアプリのサイト（instagram.com）もiOSが止めることがある。
-        // DM画面を出している間だけ、ドパ抜きが使う全ストアの遮断を外す（閉じる・アプリを離れると すぐ戻す）
-        for name in [ManagedSettingsStore.Name("session"), .nightBlock] {
-            let store = ManagedSettingsStore(named: name)
-            store.shield.applications = nil
-            store.shield.applicationCategories = nil
-            store.shield.webDomains = nil
-            store.shield.webDomainCategories = nil
-            store.webContent.blockedByFilter = nil
-        }
-        // 前のバージョンのストアと、名前なしのストアは もう使わないので ぜんぶ消す
-        ManagedSettingsStore(named: .dailyLimit).clearAllSettings()
+        // DM画面を出している間だけ、ドパ抜きのブロックを ぜんぶ外す（閉じる・アプリを離れると すぐ戻す）
+        Shields.liftAll()
         ManagedSettingsStore(named: .always).clearAllSettings()
         ManagedSettingsStore().clearAllSettings()
         #endif
@@ -169,8 +160,7 @@ enum DMGate {
         #if !DEMO
         guard UserDefaults.standard.bool(forKey: flag) else { return }
         UserDefaults.standard.set(false, forKey: flag)
-        if UserDefaults.standard.object(forKey: "p.sStart") != nil { SessionShield.on() }
-        if SharedSettings.nightBlockEnabled && NightLock.isReady && NightLock.isSleepTime() { Blocker.block(.nightBlock) }
+        Shields.restore()
         #endif
     }
 }

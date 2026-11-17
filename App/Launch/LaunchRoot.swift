@@ -12,6 +12,7 @@ enum LaunchTab: Int, CaseIterable {
 struct LaunchRoot: View {
     @StateObject private var game = GameState()
     @StateObject private var life = LifeState()
+    @ObservedObject private var router = Router.shared
     @State private var tab: LaunchTab = .room
     @State private var replayOpening = false
     @State private var chatDone = false
@@ -38,6 +39,13 @@ struct LaunchRoot: View {
         }
         .fullScreenCover(isPresented: $replayOpening) {
             OpeningView { replayOpening = false }
+        }
+        // ブロック画面の「ちょっとだけ開く」→ 通知 → ここ
+        .fullScreenCover(isPresented: $router.preOpen) {
+            PreOpenView(origin: .shield).environmentObject(game).environmentObject(life)
+        }
+        .sheet(isPresented: $router.routineAsk) {
+            RoutineAskView().environmentObject(life).presentationDetents([.medium])
         }
         .onChange(of: scenePhase) { phase in
             if phase == .active {
@@ -73,6 +81,8 @@ struct LaunchRoot: View {
                 game.start(p)
             }
             if d.bool(forKey: "debugIcon") { IconExport.run() }
+            if d.bool(forKey: "debugPreOpen") { router.preOpen = true }
+            if d.bool(forKey: "debugMilestone") { life.pendingMilestone = 600 }
             #endif
         }
     }
@@ -126,6 +136,11 @@ struct LaunchRoot: View {
     private func refresh() {
         defer { updateBGM() }
         game.checkNight()
+        Schedules.apply()
+        // 毎日いっしょに置く時間がおわっていたら、おかえり
+        if game.flow == nil, let r = Schedules.takeRoutineDone(), r.minutes > 0 {
+            game.flow = .result(SessionResult(minutes: r.minutes, bones: 0, stars: 0, purpose: r.purpose, goal: r.minutes, completed: true))
+        }
         game.nightToast = nil   // ローンチ版は朝のあいさつで伝える
         game.clock = Date()
         life.weekCardIfNeeded()
@@ -202,6 +217,12 @@ struct LaunchSettingsView: View {
     @State private var devTaps = 0
     @State private var bgm = BowlPlayer.shared.bgmEnabled
     @State private var nightLock = SharedSettings.nightBlockEnabled
+    @State private var goalOn = SharedSettings.goalEnabled
+    @State private var goalMin = SharedSettings.goalMinutes
+    @State private var routineOn = SharedSettings.routineEnabled
+    @State private var rStart = SharedSettings.routineStartHour
+    @State private var rEnd = SharedSettings.routineEndHour
+    @State private var rDays = SharedSettings.routineWeekdays
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -274,9 +295,71 @@ struct LaunchSettingsView: View {
                         .buttonStyle(PressStyle(scale: 0.97))
                 }
 
+                section("1日の目標") {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Toggle(isOn: Binding(get: { goalOn }, set: { goalOn = $0; SharedSettings.goalEnabled = $0; Schedules.reset() })) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("時間を食べるアプリは 1日").font(.dp(15, .heavy))
+                                Text("目標をこえたら、きょうはブロック").font(.dp(12, .bold)).foregroundColor(DP.gray)
+                            }
+                        }
+                        .tint(DP.violet)
+                        if goalOn {
+                            FlowChips(items: GoalChoice.labels, selected: GoalChoice.label(goalMin)) { l in
+                                goalMin = GoalChoice.minutes(l) ?? goalMin
+                                SharedSettings.goalMinutes = goalMin
+                                Schedules.reset()
+                            }
+                            Stepper("\(GoalChoice.label(goalMin))まで", value: Binding(get: { goalMin }, set: {
+                                goalMin = $0; SharedSettings.goalMinutes = $0; Schedules.reset()
+                            }), in: 10...300, step: 10)
+                            .font(.dp(14, .heavy))
+                        }
+                    }
+                    .padding(14)
+                    .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(DP.card))
+                }
+
+                section("毎日いっしょに置く時間") {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Toggle(isOn: Binding(get: { routineOn }, set: { routineOn = $0; SharedSettings.routineEnabled = $0; Schedules.reset() })) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("自動でスマホを置く").font(.dp(15, .heavy))
+                                Text("時間になったらブロック＋お知らせ（夜がかさなったら夜を優先）").font(.dp(12, .bold)).foregroundColor(DP.gray)
+                            }
+                        }
+                        .tint(DP.violet)
+                        if routineOn {
+                            HStack(spacing: 10) {
+                                hourBox("はじめ", Binding(get: { rStart }, set: { rStart = $0; SharedSettings.routineStartHour = $0; Schedules.reset() }))
+                                Image(systemName: "arrow.right").foregroundColor(DP.gray)
+                                hourBox("おわり", Binding(get: { rEnd }, set: { rEnd = $0; SharedSettings.routineEndHour = $0; Schedules.reset() }))
+                            }
+                            HStack(spacing: 6) {
+                                ForEach(1...7, id: \.self) { wd in
+                                    let on = rDays.contains(wd)
+                                    Button {
+                                        if on { rDays.removeAll { $0 == wd } } else { rDays.append(wd) }
+                                        SharedSettings.routineWeekdays = rDays.sorted()
+                                        Schedules.reset()
+                                        Haptic.select()
+                                    } label: {
+                                        Text(["日", "月", "火", "水", "木", "金", "土"][wd - 1]).font(.dp(13, .heavy))
+                                            .foregroundColor(on ? .black : .white)
+                                            .frame(width: 36, height: 36)
+                                            .background(Circle().fill(on ? Color.white : DP.card2))
+                                    }
+                                    .buttonStyle(PressStyle())
+                                }
+                            }
+                        }
+                    }
+                    .padding(14)
+                    .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(DP.card))
+                }
+
                 section("応援する") {
-                    row(icon: "heart.fill", title: "ドパ抜きに寄付する", sub: "準備中")
-                        .opacity(0.6)
+                    TipJarCard()
                 }
 
                 Text("ドパ抜き 1.0")
@@ -420,5 +503,16 @@ struct BedtimeChatView: View {
             Button { Haptic.select(); next() } label: { Text(text.wrappedValue.isEmpty ? "とばす" : "つぎへ") }
                 .buttonStyle(PuffyStyle(color: text.wrappedValue.isEmpty ? .white : .blue, height: 54, strong: !text.wrappedValue.isEmpty))
         }
+    }
+}
+
+/// 1日の目標のえらびかた
+enum GoalChoice {
+    static let labels = ["30分", "1時間", "1.5時間", "2時間"]
+    static func minutes(_ l: String) -> Int? { ["30分": 30, "1時間": 60, "1.5時間": 90, "2時間": 120][l] }
+    static func label(_ m: Int) -> String {
+        if m % 60 == 0 { return "\(m / 60)時間" }
+        if m > 60 && m % 30 == 0 { return String(format: "%.1f時間", Double(m) / 60) }
+        return m > 60 ? "\(m / 60)時間\(m % 60)分" : "\(m)分"
     }
 }

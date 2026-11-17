@@ -35,6 +35,7 @@ targets:
     dependencies:
       - target: MonitorExtension
       - target: ShieldExtension
+      - target: ShieldActionExtension
       - target: ContentBlocker
       - target: ReportExtension
   # TestFlight で友達に配るデモ版（スクリーンタイムのブロックなし・拡張なし。バンドルIDは本体と同じ）
@@ -81,7 +82,7 @@ targets:
   ShieldExtension:
     type: app-extension
     platform: iOS
-    sources: [ShieldExtension, Shared/DetoxTips.swift]
+    sources: [ShieldExtension, Shared]
     info:
       path: ShieldExtension/Info.plist
       properties:
@@ -93,6 +94,23 @@ targets:
       path: ShieldExtension/ShieldExtension.entitlements
       properties:
         com.apple.developer.family-controls: true
+        com.apple.security.application-groups: [group.com.isk.dopanuki]
+  ShieldActionExtension:
+    type: app-extension
+    platform: iOS
+    sources: [ShieldActionExtension, Shared]
+    info:
+      path: ShieldActionExtension/Info.plist
+      properties:
+        CFBundleDisplayName: ドパ抜き ブロック画面のボタン
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.ManagedSettings.shield-action-service
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShieldActionExtension
+    entitlements:
+      path: ShieldActionExtension/ShieldActionExtension.entitlements
+      properties:
+        com.apple.developer.family-controls: true
+        com.apple.security.application-groups: [group.com.isk.dopanuki]
   ContentBlocker:
     type: app-extension
     platform: iOS

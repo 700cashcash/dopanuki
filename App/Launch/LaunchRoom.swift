@@ -77,6 +77,11 @@ struct LaunchRoomView: View {
         HStack(spacing: 8) {
             pill(icon: "flag.fill", color: DP.yellow, text: life.todayGoal.isEmpty ? "きょう: まだ" : "きょう: \(life.todayGoal)")
             pill(icon: "clock.arrow.circlepath", color: DP.green, text: hm(life.todayMinutes))
+            if SharedSettings.goalEnabled && NightLock.isReady {
+                // きょう時間を食べるアプリを使った分（5分きざみ）/ 目標
+                pill(icon: "hourglass", color: Shields.goalHitToday ? DP.red : DP.pink,
+                     text: "\(Shields.usageToday)分/\(GoalChoice.label(SharedSettings.goalMinutes))")
+            }
             Spacer()
             Button { showSettings = true } label: { CircleIcon(system: "gearshape") }
                 .buttonStyle(PressStyle())

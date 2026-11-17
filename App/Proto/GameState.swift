@@ -416,18 +416,16 @@ enum SessionShield {
     static func on() {}
     static func off() {}
     #else
-    private static let store = ManagedSettingsStore(named: ManagedSettingsStore.Name("session"))
-
     static func on() {
+        Shields.sessionActive = true     // 監視拡張がブロックを戻すときにも使う
         guard AuthorizationCenter.shared.authorizationStatus == .approved else { return }
-        let s = SharedSettings.selection
-        store.shield.applications = s.applicationTokens.isEmpty ? nil : s.applicationTokens
-        store.shield.applicationCategories = s.categoryTokens.isEmpty ? nil : .specific(s.categoryTokens)
-        store.shield.webDomains = s.webDomainTokens.isEmpty ? nil : s.webDomainTokens
+        if (Shields.unlockedUntil ?? .distantPast) > Date() { return }   // 「ちょっとだけ開く」中
+        Blocker.block(.session)
     }
 
     static func off() {
-        store.clearAllSettings()
+        Shields.sessionActive = false
+        Blocker.unblock(.session)
     }
     #endif
 }

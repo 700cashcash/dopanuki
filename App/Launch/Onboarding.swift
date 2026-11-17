@@ -13,6 +13,10 @@ struct OnboardingView: View {
     @State private var bed = SharedSettings.nightStartHour
     @State private var wake = SharedSettings.nightEndHour
     @State private var message: String?
+    @State private var goal = 60
+    @State private var goalFree = false
+    @State private var rStart = 20
+    @State private var rEnd = 21
 
     var body: some View {
         ZStack {
@@ -45,7 +49,7 @@ struct OnboardingView: View {
     @ViewBuilder private var page: some View {
         VStack(alignment: .leading, spacing: 18) {
             HStack(spacing: 6) {
-                ForEach(1...4, id: \.self) { i in
+                ForEach(1...6, id: \.self) { i in
                     Capsule().fill(i <= step ? Color.white : Color.white.opacity(0.2)).frame(height: 4)
                 }
             }
@@ -53,7 +57,7 @@ struct OnboardingView: View {
 
             HStack {
                 Spacer()
-                DogView(size: 150, mood: step == 4 ? .happy : .normal, alive: true)
+                DogView(size: 150, mood: step == 6 ? .happy : .normal, alive: true)
                     .bob(4)
                 Spacer()
             }
@@ -63,6 +67,8 @@ struct OnboardingView: View {
             case 1: nameStep
             case 2: screenTimeStep
             case 3: bedStep
+            case 4: goalStep
+            case 5: routineStep
             default: firstStep
             }
         }
@@ -137,7 +143,61 @@ struct OnboardingView: View {
         }
     }
 
-    // ④ 最初の3分
+    // ④ 1日の目標
+    private var goalStep: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Bubble(text: "時間を食べるアプリは、1日どれくらいまでにする？")
+            FlowChips(items: GoalChoice.labels + ["自由"], selected: goalFree ? "自由" : GoalChoice.label(goal)) { l in
+                Haptic.select()
+                if l == "自由" { goalFree = true } else { goalFree = false; goal = GoalChoice.minutes(l) ?? 60 }
+            }
+            if goalFree {
+                Stepper("\(GoalChoice.label(goal))まで", value: $goal, in: 10...300, step: 10).font(.dp(16, .heavy))
+            }
+            Text("目標をこえたら、その日はブロック。半分・のこり10分でお知らせするよ").font(.dp(12, .bold)).foregroundColor(DP.dim)
+            Spacer(minLength: 0)
+            Button {
+                SharedSettings.goalEnabled = true
+                SharedSettings.goalMinutes = goal
+                next()
+            } label: { Text("\(GoalChoice.label(goal))にする") }
+                .buttonStyle(PuffyStyle(color: .blue, height: 58))
+            Button("目標はなしにする") { SharedSettings.goalEnabled = false; next() }
+                .font(.dp(13, .heavy)).foregroundColor(DP.gray).frame(maxWidth: .infinity)
+        }
+    }
+
+    // ⑤ 毎日いっしょに置く時間
+    private var routineStep: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Bubble(text: "毎日いっしょに スマホを置く時間、決めよ？")
+            HStack(spacing: 10) {
+                hourBox("はじめ", $rStart)
+                Image(systemName: "arrow.right").foregroundColor(DP.gray)
+                hourBox("おわり", $rEnd)
+            }
+            Text("時間になったら じどうでブロックして、お知らせするよ。曜日は設定で えらべるよ").font(.dp(12, .bold)).foregroundColor(DP.dim)
+            Spacer(minLength: 0)
+            Button {
+                SharedSettings.routineEnabled = true
+                SharedSettings.routineStartHour = rStart
+                SharedSettings.routineEndHour = rEnd
+                Schedules.askNotifications()
+                Schedules.reset()
+                next()
+            } label: { Text("これでOK") }
+                .buttonStyle(PuffyStyle(color: .blue, height: 58))
+            Button("いまはなしにする") {
+                SharedSettings.routineEnabled = false
+                Schedules.askNotifications()
+                Schedules.reset()
+                next()
+            }
+            .font(.dp(13, .heavy)).foregroundColor(DP.gray).frame(maxWidth: .infinity)
+        }
+    }
+
+    // ⑥ 最初の3分
     private var firstStep: some View {
         VStack(alignment: .leading, spacing: 16) {
             Bubble(text: "さいしょは 3分だけ。スマホ置いて、ぼくと まってて")

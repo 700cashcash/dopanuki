@@ -40,10 +40,19 @@ struct ShareCard: View {
         case .kimo: return Color(hex: 0x4A4458)
         case .back: return Color(hex: 0xE8661E)
         case .week: return Color(hex: 0x2F6BD0)
+        case .milestone: return Color(hex: 0xE0A400)
         }
     }
 
     var body: some View {
+        if card.kind == .result || card.kind == .milestone {
+            BoardingPass(card: card, name: name)
+        } else {
+            poster
+        }
+    }
+
+    private var poster: some View {
         ZStack(alignment: .topLeading) {
             bg
             Blob(color: DP.pink.opacity(card.kind == .kimo ? 0.35 : 0.9), size: 300, period: 10).offset(x: 170, y: -110)
@@ -93,6 +102,7 @@ struct ShareCard: View {
         case .kimo: return "☁️ 夜ふかしした朝"
         case .back: return "✨ もどった！"
         case .week: return "🗓️ 今週のまとめ"
+        case .milestone: return "🏆 記念"
         }
     }
 
@@ -120,6 +130,8 @@ struct ShareCard: View {
             Text("今夜はいっしょに ねよ").font(.dp(15, .heavy)).foregroundColor(.white.opacity(0.85))
         case .back:
             Text("ちゃんと ねたら\nツヤツヤに もどった！").font(.dp(26, .black)).foregroundColor(.white)
+        case .milestone:
+            Text(card.text).font(.dp(30, .black)).foregroundColor(.white)
         case .week:
             Text("今週は").font(.dp(20, .heavy)).foregroundColor(.white)
             Text(card.text).font(.dp(34, .black)).foregroundColor(DP.yellow)
@@ -170,5 +182,119 @@ struct CardDetailView: View {
         .padding(20)
         .background(DP.bg.ignoresSafeArea())
         .preferredColorScheme(.dark)
+    }
+}
+
+/// 結果カード：搭乗券（ボーディングパス）風。FROM「SNS」→ TO「何する？」
+struct BoardingPass: View {
+    let card: SavedCard
+    let name: String
+
+    private var gold: Bool { card.kind == .milestone }
+    private var ink: Color { gold ? Color(hex: 0x3A2A00) : Color(hex: 0x1A1A2E) }
+    private var accent: Color { gold ? Color(hex: 0xE0A400) : DP.blue }
+    private var flight: String { String(format: "DPN-%04d", card.number ?? 0) }
+    private var to: String { gold ? card.text : (card.purpose.isEmpty ? "じぶんの時間" : card.purpose) }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // 上：航空会社・便名
+            HStack {
+                Text("✈︎ DOPANUKI AIR").font(.system(size: 12, weight: .black)).foregroundColor(.white)
+                Spacer()
+                Text(flight).font(.system(size: 13, weight: .heavy, design: .monospaced)).foregroundColor(.white)
+            }
+            .padding(.horizontal, 20).frame(height: 44)
+            .background(accent)
+
+            VStack(alignment: .leading, spacing: 14) {
+                Text(gold ? "MILESTONE PASS" : "BOARDING PASS").font(.system(size: 11, weight: .heavy)).foregroundColor(ink.opacity(0.5))
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("FROM").font(.system(size: 10, weight: .heavy)).foregroundColor(ink.opacity(0.5))
+                        Text("SNS").font(.system(size: 34, weight: .black)).foregroundColor(ink)
+                    }
+                    Spacer()
+                    Image(systemName: "airplane").font(.system(size: 24, weight: .bold)).foregroundColor(accent)
+                    Spacer()
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text("TO").font(.system(size: 10, weight: .heavy)).foregroundColor(ink.opacity(0.5))
+                        Text(to).font(.system(size: to.count > 5 ? 20 : 30, weight: .black)).foregroundColor(ink)
+                            .lineLimit(1).minimumScaleFactor(0.5)
+                    }
+                }
+                HStack(alignment: .top) {
+                    field("PASSENGER", name)
+                    Spacer()
+                    field("DATE", dateText)
+                    Spacer()
+                    field("GATE", "基地")
+                }
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(gold ? "TOTAL" : "取り戻した時間").font(.system(size: 10, weight: .heavy)).foregroundColor(ink.opacity(0.5))
+                    Text(minutesText).font(.system(size: 40, weight: .black)).foregroundColor(accent)
+                        .lineLimit(1).minimumScaleFactor(0.6)
+                }
+            }
+            .padding(20)
+
+            // ミシン目
+            ZStack {
+                Rectangle().fill(Color.clear).frame(height: 24)
+                Path { p in p.move(to: CGPoint(x: 16, y: 12)); p.addLine(to: CGPoint(x: 304, y: 12)) }
+                    .stroke(ink.opacity(0.25), style: StrokeStyle(lineWidth: 2, dash: [5, 5]))
+                HStack {
+                    Circle().fill(DP.bg).frame(width: 24, height: 24).offset(x: -12)
+                    Spacer()
+                    Circle().fill(DP.bg).frame(width: 24, height: 24).offset(x: 12)
+                }
+            }
+
+            // 下：半券（バーコード・ドパ抜きちゃん）
+            HStack(alignment: .bottom) {
+                VStack(alignment: .leading, spacing: 6) {
+                    barcode.frame(width: 170, height: 46)
+                    Text("#ドパ抜きチャレンジ").font(.dp(11, .heavy)).foregroundColor(ink.opacity(0.6))
+                }
+                Spacer()
+                DogView(size: 92, mood: .happy, blinks: false, pose: DogPose(paw: true))
+                    .offset(y: 8)
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 14)
+            Spacer(minLength: 0)
+        }
+        .frame(width: 320, height: 520)
+        .background(gold ? Color(hex: 0xFFF4D6) : Color(hex: 0xF7F5EF))
+        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+    }
+
+    private func field(_ label: String, _ value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(label).font(.system(size: 9, weight: .heavy)).foregroundColor(ink.opacity(0.5))
+            Text(value).font(.system(size: 14, weight: .heavy)).foregroundColor(ink).lineLimit(1)
+        }
+    }
+
+    private var dateText: String {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy.M.d"
+        return f.string(from: card.date)
+    }
+
+    private var minutesText: String {
+        let m = card.minutes
+        return m >= 60 ? "\(m / 60)時間" + (m % 60 > 0 ? "\(m % 60)分" : "") : "\(m)分"
+    }
+
+    /// バーコード風の飾り（便名から作るので毎回同じ）
+    private var barcode: some View {
+        let seed = (card.number ?? 7) * 2654435761
+        return HStack(spacing: 1.5) {
+            ForEach(0..<44, id: \.self) { i in
+                Rectangle().fill(ink)
+                    .frame(width: CGFloat(1 + ((seed >> (i % 28)) ^ i) % 3))
+            }
+        }
     }
 }

@@ -11,48 +11,95 @@ struct SessionRecord: Codable, Identifiable, Equatable {
 
 /// 記録タブにたまるカード
 struct SavedCard: Codable, Identifiable, Equatable {
-    enum Kind: String, Codable { case declare, result, kimo, back, week }
+    enum Kind: String, Codable { case declare, result, kimo, back, week, milestone }
     var id = UUID()
     var date = Date()
     var kind: Kind
     var minutes = 0
     var purpose = ""
     var text = ""        // 期間（宣言）・キモさ（キモ朝）・週のまとめ など
+    var number: Int? = nil   // 搭乗券の便名（DPN-0042）
 }
 
-/// ローンチ版の記録（端末の中だけに保存）
+/// ちょっとだけ開いた記録
+struct OpenLog: Codable, Equatable {
+    var date = Date()
+    var purpose: String
+    var minutes: Int
+}
+
+/// ローンチ版の記録（端末の中だけに保存）。項目を足しても、前のデータが消えないように1つずつ読む
 struct LifeData: Codable {
-    var onboarded = false
+    var onboarded: Bool = false
     var records: [SessionRecord] = []
     var cards: [SavedCard] = []
     var customPurposes: [String] = []
-    var todayGoal = ""
-    var goalDay = ""
-    var tomorrowPlan = ""
-    var planDay = ""                 // tomorrowPlan を言った夜の日付
+    var todayGoal: String = ""
+    var goalDay: String = ""
+    var tomorrowPlan: String = ""
+    var planDay: String = ""   // tomorrowPlan を言った夜の日付
     var doneNotes: [String: String] = [:]   // 日付 → きょうできたこと
-    var neeneeDay = ""
-    var neeneeCount = 0
-    var morningAskedDay = ""
-    var quizDay = ""
-    var pendingQuiz = false
-    var quizIndex = 0
-    var morningShownDay = ""         // 朝のあいさつ（キモ朝・もどった）を出した日
-    var lastKimo = 0                 // きのうの朝のキモさ
-    var sleptNights = 0              // 基地でねた夜の数
-    var lastSleptKey = ""
-    var weekCardKey = ""
-    var kimoPreview = -1             // 開発用：-1 = 本物、0〜4 = 見た目を固定
-    var sleepTalkDay = ""
-    var sleepKey = ""
-    var tipOrder: [Int] = []         // tips を出す順番（一周したらシャッフルしなおす）
-    var tipPos = 0                // おやすみロックOFFで「おやすみ」した夜（部屋を消灯するだけ）
+    var neeneeDay: String = ""
+    var neeneeCount: Int = 0
+    var morningAskedDay: String = ""
+    var quizDay: String = ""
+    var pendingQuiz: Bool = false
+    var quizIndex: Int = 0
+    var morningShownDay: String = ""   // 朝のあいさつ（キモ朝・もどった）を出した日
+    var lastKimo: Int = 0   // きのうの朝のキモさ
+    var sleptNights: Int = 0   // 基地でねた夜の数
+    var lastSleptKey: String = ""
+    var weekCardKey: String = ""
+    var kimoPreview: Int = -1   // 開発用：-1 = 本物、0〜4 = 見た目を固定
+    var sleepTalkDay: String = ""
+    var sleepKey: String = ""   // おやすみロックOFFで「おやすみ」した夜（部屋を消灯するだけ）
+    var tipOrder: [Int] = []   // tips を出す順番（一周したらシャッフルしなおす）
+    var tipPos: Int = 0
+    var ticketCount: Int = 0   // 搭乗券の便名の通し番号（DPN-0042）
+    var milestonesDone: [Int] = []   // お祝いした合計時間（分）
+    var opens: [OpenLog] = []   // ちょっとだけ開いた記録（目的と分）
+
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        onboarded = (try? c.decodeIfPresent(Bool.self, forKey: .onboarded)) ?? false
+        records = (try? c.decodeIfPresent([SessionRecord].self, forKey: .records)) ?? []
+        cards = (try? c.decodeIfPresent([SavedCard].self, forKey: .cards)) ?? []
+        customPurposes = (try? c.decodeIfPresent([String].self, forKey: .customPurposes)) ?? []
+        todayGoal = (try? c.decodeIfPresent(String.self, forKey: .todayGoal)) ?? ""
+        goalDay = (try? c.decodeIfPresent(String.self, forKey: .goalDay)) ?? ""
+        tomorrowPlan = (try? c.decodeIfPresent(String.self, forKey: .tomorrowPlan)) ?? ""
+        planDay = (try? c.decodeIfPresent(String.self, forKey: .planDay)) ?? ""
+        doneNotes = (try? c.decodeIfPresent([String: String].self, forKey: .doneNotes)) ?? [:]
+        neeneeDay = (try? c.decodeIfPresent(String.self, forKey: .neeneeDay)) ?? ""
+        neeneeCount = (try? c.decodeIfPresent(Int.self, forKey: .neeneeCount)) ?? 0
+        morningAskedDay = (try? c.decodeIfPresent(String.self, forKey: .morningAskedDay)) ?? ""
+        quizDay = (try? c.decodeIfPresent(String.self, forKey: .quizDay)) ?? ""
+        pendingQuiz = (try? c.decodeIfPresent(Bool.self, forKey: .pendingQuiz)) ?? false
+        quizIndex = (try? c.decodeIfPresent(Int.self, forKey: .quizIndex)) ?? 0
+        morningShownDay = (try? c.decodeIfPresent(String.self, forKey: .morningShownDay)) ?? ""
+        lastKimo = (try? c.decodeIfPresent(Int.self, forKey: .lastKimo)) ?? 0
+        sleptNights = (try? c.decodeIfPresent(Int.self, forKey: .sleptNights)) ?? 0
+        lastSleptKey = (try? c.decodeIfPresent(String.self, forKey: .lastSleptKey)) ?? ""
+        weekCardKey = (try? c.decodeIfPresent(String.self, forKey: .weekCardKey)) ?? ""
+        kimoPreview = (try? c.decodeIfPresent(Int.self, forKey: .kimoPreview)) ?? -1
+        sleepTalkDay = (try? c.decodeIfPresent(String.self, forKey: .sleepTalkDay)) ?? ""
+        sleepKey = (try? c.decodeIfPresent(String.self, forKey: .sleepKey)) ?? ""
+        tipOrder = (try? c.decodeIfPresent([Int].self, forKey: .tipOrder)) ?? []
+        tipPos = (try? c.decodeIfPresent(Int.self, forKey: .tipPos)) ?? 0
+        ticketCount = (try? c.decodeIfPresent(Int.self, forKey: .ticketCount)) ?? 0
+        milestonesDone = (try? c.decodeIfPresent([Int].self, forKey: .milestonesDone)) ?? []
+        opens = (try? c.decodeIfPresent([OpenLog].self, forKey: .opens)) ?? []
+    }
 }
 
 final class LifeState: ObservableObject {
     @Published var data: LifeData { didSet { save() } }
     /// 部屋の「ねえねえ」
     @Published var neenee: Neenee?
+    /// 合計 10・50・100時間に届いた（おかえりのあとにお祝い）
+    @Published var pendingMilestone: Int?
 
     private static let key = "life.v1"
 
@@ -98,12 +145,26 @@ final class LifeState: ObservableObject {
         guard !data.records.contains(where: { $0.id == r.id }) else { return }
         data.records.append(SessionRecord(id: r.id, date: Date(), minutes: r.minutes, purpose: r.purpose, completed: r.completed))
         if r.minutes > 0 {
-            data.cards.append(SavedCard(kind: .result, minutes: r.minutes, purpose: r.purpose))
+            data.ticketCount += 1
+            data.cards.append(SavedCard(kind: .result, minutes: r.minutes, purpose: r.purpose, number: data.ticketCount))
+        }
+        // 合計の取り戻した時間のお祝い（一度だけ）
+        let total = totalMinutes
+        for m in Self.milestones where total >= m && !data.milestonesDone.contains(m) {
+            data.milestonesDone.append(m)
+            data.ticketCount += 1
+            data.cards.append(SavedCard(kind: .milestone, minutes: m, text: "\(m / 60)時間記念", number: data.ticketCount))
+            pendingMilestone = m
         }
         data.pendingQuiz = true
     }
 
     func addCard(_ c: SavedCard) { data.cards.append(c) }
+
+    static let milestones = [600, 3000, 6000]   // 10・50・100時間
+
+    /// いま結果カードに出す便名（最後の結果カード）
+    var lastTicket: Int { data.ticketCount }
 
     var todayMinutes: Int {
         let cal = Calendar.current
@@ -266,11 +327,12 @@ final class LifeState: ObservableObject {
         }
         data.cards = [
             SavedCard(kind: .declare, purpose: "英単語", text: "21:30まで"),
-            SavedCard(kind: .result, minutes: 40, purpose: "英単語"),
+            SavedCard(kind: .result, minutes: 40, purpose: "英単語", number: 41),
+            SavedCard(kind: .milestone, minutes: 600, text: "10時間記念", number: 40),
             SavedCard(kind: .kimo, text: "3"),
             SavedCard(kind: .back, text: "ツヤツヤ"),
             SavedCard(kind: .week, minutes: 480, text: "映画4本ぶん"),
-            SavedCard(kind: .result, minutes: 25, purpose: "読書"),
+            SavedCard(kind: .result, minutes: 25, purpose: "読書", number: 42),
         ]
         data.sleptNights = 5
         data.todayGoal = "英単語"

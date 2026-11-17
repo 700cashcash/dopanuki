@@ -25,6 +25,7 @@ struct WelcomeBackView: View {
             TopGlow(color: sad ? Color(hex: 0x3B2FA0) : Color(hex: 0x1E9E5E), reach: 0.6)
             if phase >= 2 && !sad && !sleepy { Confetti().ignoresSafeArea() }
             if phase < 3 { reaction } else { resultCard.transition(.move(edge: .bottom).combined(with: .opacity)) }
+            if phase == 3, let m = life.pendingMilestone { MilestoneView(minutes: m) { life.pendingMilestone = nil }.transition(.opacity) }
         }
         .animation(.spring(response: 0.45, dampingFraction: 0.8), value: phase)
         .onAppear {
@@ -145,7 +146,8 @@ struct WelcomeBackView: View {
     // MARK: 結果カード
 
     private var resultCard: some View {
-        let card = SavedCard(kind: .result, minutes: result.minutes, purpose: result.purpose)
+        let card = life.data.cards.last(where: { $0.kind == .result && $0.minutes == result.minutes })
+            ?? SavedCard(kind: .result, minutes: result.minutes, purpose: result.purpose)
         let img = renderCard(ShareCard(card: card, name: life.nameForCards(game)))
         return VStack(spacing: 16) {
             HStack {
@@ -192,5 +194,34 @@ extension LifeState {
     func nameForCards(_ game: GameState) -> String {
         let n = game.userName.trimmingCharacters(in: .whitespaces)
         return n.isEmpty ? "わたし" : n
+    }
+}
+
+/// 合計 10・50・100時間のお祝い（一度だけ）
+struct MilestoneView: View {
+    let minutes: Int
+    var onDone: () -> Void
+    @State private var jump = false
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.75).ignoresSafeArea()
+            Confetti().ignoresSafeArea()
+            VStack(spacing: 18) {
+                Text("🏆").font(.system(size: 54))
+                Text("\(minutes / 60)時間 記念！").font(.dp(34, .black)).foregroundColor(DP.yellow)
+                Text("ここまで いっしょに取り戻したね").font(.dp(16, .heavy))
+                DogView(size: 180, mood: .happy, pose: DogPose(tailWag: jump ? 20 : -14, mouthOpen: 0.6, paw: true), alive: true)
+                    .offset(y: jump ? -24 : 0)
+                Text("記念カードを 記録に追加したよ").font(.dp(13, .bold)).foregroundColor(DP.gray)
+                Button("やったー！") { Haptic.success(); onDone() }
+                    .buttonStyle(PuffyStyle(color: .yellow, height: 56))
+                    .padding(.horizontal, 40)
+            }
+        }
+        .onAppear {
+            Haptic.success()
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.35).repeatCount(5, autoreverses: true)) { jump = true }
+        }
     }
 }
