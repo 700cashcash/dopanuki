@@ -19,6 +19,7 @@ struct SavedCard: Codable, Identifiable, Equatable {
     var purpose = ""
     var text = ""        // 期間（宣言）・キモさ（キモ朝）・週のまとめ など
     var number: Int? = nil   // 搭乗券の便名（DPN-0042）
+    var fruit: String? = nil // とれた実
 }
 
 /// ちょっとだけ開いた記録
@@ -57,7 +58,8 @@ struct LifeData: Codable {
     var tipPos: Int = 0
     var ticketCount: Int = 0   // 搭乗券の便名の通し番号（DPN-0042）
     var milestonesDone: [Int] = []   // お祝いした合計時間（分）
-    var opens: [OpenLog] = []   // ちょっとだけ開いた記録（目的と分）
+    var opens: [OpenLog] = []
+    var eaten: [String: Int] = [:]   // 図鑑：食べた実 → こ数   // ちょっとだけ開いた記録（目的と分）
 
     init() {}
 
@@ -91,6 +93,7 @@ struct LifeData: Codable {
         ticketCount = (try? c.decodeIfPresent(Int.self, forKey: .ticketCount)) ?? 0
         milestonesDone = (try? c.decodeIfPresent([Int].self, forKey: .milestonesDone)) ?? []
         opens = (try? c.decodeIfPresent([OpenLog].self, forKey: .opens)) ?? []
+        eaten = (try? c.decodeIfPresent([String: Int].self, forKey: .eaten)) ?? [:]
     }
 }
 
@@ -100,6 +103,8 @@ final class LifeState: ObservableObject {
     @Published var neenee: Neenee?
     /// 合計 10・50・100時間に届いた（おかえりのあとにお祝い）
     @Published var pendingMilestone: Int?
+    /// おかえりのあとに収穫する実（小さい＝途中でやめた）
+    @Published var pendingHarvest: (fruit: Fruit, small: Bool)?
 
     private static let key = "life.v1"
 
@@ -145,8 +150,11 @@ final class LifeState: ObservableObject {
         guard !data.records.contains(where: { $0.id == r.id }) else { return }
         data.records.append(SessionRecord(id: r.id, date: Date(), minutes: r.minutes, purpose: r.purpose, completed: r.completed))
         if r.minutes > 0 {
+            // セッションごとに たねが1つ。置いた時間で実のレア度が決まる
+            let fruit = Fruit.roll(minutes: r.minutes, completed: r.completed)
+            pendingHarvest = (fruit, !r.completed)
             data.ticketCount += 1
-            data.cards.append(SavedCard(kind: .result, minutes: r.minutes, purpose: r.purpose, number: data.ticketCount))
+            data.cards.append(SavedCard(kind: .result, minutes: r.minutes, purpose: r.purpose, number: data.ticketCount, fruit: fruit.id))
         }
         // 合計の取り戻した時間のお祝い（一度だけ）
         let total = totalMinutes
@@ -162,6 +170,12 @@ final class LifeState: ObservableObject {
     func addCard(_ c: SavedCard) { data.cards.append(c) }
 
     static let milestones = [600, 3000, 6000]   // 10・50・100時間
+
+    /// 実を食べた（図鑑に のる）
+    func eat(_ f: Fruit) {
+        data.eaten[f.id, default: 0] += 1
+        pendingHarvest = nil
+    }
 
     /// いま結果カードに出す便名（最後の結果カード）
     var lastTicket: Int { data.ticketCount }
@@ -327,7 +341,7 @@ final class LifeState: ObservableObject {
         }
         data.cards = [
             SavedCard(kind: .declare, purpose: "英単語", text: "21:30まで"),
-            SavedCard(kind: .result, minutes: 40, purpose: "英単語", number: 41),
+            SavedCard(kind: .result, minutes: 40, purpose: "英単語", number: 41, fruit: "melon"),
             SavedCard(kind: .milestone, minutes: 600, text: "10時間記念", number: 40),
             SavedCard(kind: .kimo, text: "3"),
             SavedCard(kind: .back, text: "ツヤツヤ"),
@@ -335,6 +349,7 @@ final class LifeState: ObservableObject {
             SavedCard(kind: .result, minutes: 25, purpose: "読書", number: 42),
         ]
         data.sleptNights = 5
+        data.eaten = ["ichigo": 3, "mikan": 1, "momo": 2, "melon": 1, "uchu": 1]
         data.todayGoal = "英単語"
         data.goalDay = Self.today()
     }

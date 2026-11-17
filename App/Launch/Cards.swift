@@ -257,8 +257,13 @@ struct BoardingPass: View {
                     Text("#ドパ抜きチャレンジ").font(.dp(11, .heavy)).foregroundColor(ink.opacity(0.6))
                 }
                 Spacer()
-                DogView(size: 92, mood: .happy, blinks: false, pose: DogPose(paw: true))
-                    .offset(y: 8)
+                ZStack(alignment: .bottomLeading) {
+                    DogView(size: 92, mood: .happy, blinks: false, pose: DogPose(paw: true))
+                        .offset(y: 8)
+                    if let f = Fruit.find(card.fruit) {
+                        FruitView(fruit: f, size: 34).offset(x: -18, y: -6)
+                    }
+                }
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 14)

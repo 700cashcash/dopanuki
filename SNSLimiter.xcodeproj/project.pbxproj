@@ -22,6 +22,7 @@
 		13F68DD38F3BE0F1C8C8E5AB /* Welcome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03048E429432A4BAFB10F2D8 /* Welcome.swift */; };
 		1513391AC6C1E3DF439A5A4A /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF7935B5DDEBA574FEB7439 /* GameState.swift */; };
 		171114245A649EA4A2A1A6E9 /* DetoxTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA7E13E773F5EDE848EB0D1 /* DetoxTips.swift */; };
+		19FEDEE01A53183D25466756 /* Garden.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20836075DE5B629FD8DA4AE7 /* Garden.swift */; };
 		1AAF117A63BB38CBAB7D0E6D /* SharedSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAB83050EB68D761E4D7A74 /* SharedSettings.swift */; };
 		1B8308C174465CC41AD3C330 /* SharedSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAB83050EB68D761E4D7A74 /* SharedSettings.swift */; };
 		239540DC1B2A1F3EAD495234 /* ShieldActionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 0320A8071E00ABDD85BBF4CC /* ShieldActionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -81,6 +82,7 @@
 		A9FDA9E23D25DD6E134BD613 /* TipJar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D921E7D61D56797E482CEB5 /* TipJar.swift */; };
 		AAFAA31778B7C0A72F113CA6 /* MonitorExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2008FBD60DEC239EB1DFF333 /* MonitorExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		AE89B78CA7B38A5B0B7AF301 /* LaunchRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7A8C24A49DD00C6209D6E69 /* LaunchRecord.swift */; };
+		B09C277E0D3728952AA8A4C5 /* Garden.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20836075DE5B629FD8DA4AE7 /* Garden.swift */; };
 		B400732234E696B58F2C5A45 /* BreathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB01F7BD21820ADFE431CDE8 /* BreathView.swift */; };
 		B7CA48256949CC565F4F2FBE /* Scenes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F3CEDA732D84417BD4730A /* Scenes.swift */; };
 		B7E461B97A37EF7B718E3059 /* Schedules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61CF8062C5870BA4C676D3C2 /* Schedules.swift */; };
@@ -171,6 +173,7 @@
 		0CDE7C3DFD9D1F4C2F228490 /* SNSLimiterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SNSLimiterApp.swift; sourceTree = "<group>"; };
 		1042858A389F4D385FD1B1B1 /* LaunchRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchRoom.swift; sourceTree = "<group>"; };
 		2008FBD60DEC239EB1DFF333 /* MonitorExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = MonitorExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		20836075DE5B629FD8DA4AE7 /* Garden.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Garden.swift; sourceTree = "<group>"; };
 		20947ADEF2AF2BF61B6DF86E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		21FA95B9F1CBA7248EA3858A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		22B1FFFACD8A69468C7FC0EF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -273,6 +276,7 @@
 			children = (
 				C716C04585E4910B325E5E99 /* Bowl.swift */,
 				49DAA652704CD28DBF39021E /* Cards.swift */,
+				20836075DE5B629FD8DA4AE7 /* Garden.swift */,
 				711553192C5FC2B3ACE41A0F /* LaunchPick.swift */,
 				D7A8C24A49DD00C6209D6E69 /* LaunchRecord.swift */,
 				1042858A389F4D385FD1B1B1 /* LaunchRoom.swift */,
@@ -637,6 +641,7 @@
 				4FF1F8320F973025BBF2246F /* DogView.swift in Sources */,
 				C3225DBE67B82C7572B03349 /* FriendsGoalsViews.swift in Sources */,
 				2F20960B47852D33B626CE6A /* GameState.swift in Sources */,
+				19FEDEE01A53183D25466756 /* Garden.swift in Sources */,
 				C2E03EC39E310B6778C7487F /* GoalExtras.swift in Sources */,
 				FEADFCF613B4084F8434AFC2 /* LaunchPick.swift in Sources */,
 				8A992EEEA6864F00962AF6CC /* LaunchRecord.swift in Sources */,
@@ -709,6 +714,7 @@
 				50D09C71E5DC410F8716E07B /* DogView.swift in Sources */,
 				75639C9F6D334B7EE132B4DF /* FriendsGoalsViews.swift in Sources */,
 				1513391AC6C1E3DF439A5A4A /* GameState.swift in Sources */,
+				B09C277E0D3728952AA8A4C5 /* Garden.swift in Sources */,
 				DB5D27745E680E9CB8077561 /* GoalExtras.swift in Sources */,
 				111D83C6C72DB7129D54E279 /* LaunchPick.swift in Sources */,
 				AE89B78CA7B38A5B0B7AF301 /* LaunchRecord.swift in Sources */,

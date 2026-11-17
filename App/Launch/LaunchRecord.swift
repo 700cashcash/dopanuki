@@ -16,6 +16,7 @@ struct LaunchRecordView: View {
                 header
                 weekChart
                 grid
+                DexSection()
                 TipJarCard().padding(.top, 6)
                 Button { replayOpening = true } label: { Label("オープニングを見なおす", systemImage: "play.circle") }
                     .buttonStyle(PuffyStyle(color: .white, height: 46, strong: false))

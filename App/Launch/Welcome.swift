@@ -12,6 +12,7 @@ struct WelcomeBackView: View {
     @State private var line = ""
     @State private var praise = ""
     @State private var hearts: [UUID] = []
+    @State private var harvesting = false
 
     private var sad: Bool { !result.completed && result.minutes < max(1, result.goal) }
     /// おやすみ時間（夜のロック中・消灯中）のおかえりは、ねむそう版
@@ -24,13 +25,23 @@ struct WelcomeBackView: View {
         ZStack {
             TopGlow(color: sad ? Color(hex: 0x3B2FA0) : Color(hex: 0x1E9E5E), reach: 0.6)
             if phase >= 2 && !sad && !sleepy { Confetti().ignoresSafeArea() }
-            if phase < 3 { reaction } else { resultCard.transition(.move(edge: .bottom).combined(with: .opacity)) }
+            if harvesting, let h = life.pendingHarvest {
+                HarvestView(fruit: h.fruit, small: h.small) {
+                    life.eat(h.fruit)
+                    withAnimation { harvesting = false; phase = 3 }
+                }
+                .transition(.opacity)
+            } else if phase < 3 { reaction } else { resultCard.transition(.move(edge: .bottom).combined(with: .opacity)) }
             if phase == 3, let m = life.pendingMilestone { MilestoneView(minutes: m) { life.pendingMilestone = nil }.transition(.opacity) }
         }
         .animation(.spring(response: 0.45, dampingFraction: 0.8), value: phase)
         .onAppear {
             play()
             #if DEBUG
+            if UserDefaults.standard.bool(forKey: "debugHarvest") {
+                if let id = UserDefaults.standard.string(forKey: "debugFruit"), let f = Fruit.find(id) { life.pendingHarvest = (f, false) }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) { next() }
+            }
             if UserDefaults.standard.bool(forKey: "debugWelcomeCard") {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { phase = 3 }
             }
@@ -66,14 +77,21 @@ struct WelcomeBackView: View {
             Text(result.minutes > 0 ? "\(result.minutes)分 取り戻した" : "おかえり").font(.dp(15, .heavy)).foregroundColor(.white.opacity(0.8))
                 .opacity(phase >= 2 ? 1 : 0)
             Spacer()
-            Button { withAnimation { phase = 3 } } label: { Text("つぎへ") }
+            Button { next() } label: { Text(life.pendingHarvest != nil ? "実をとる" : "つぎへ") }
                 .buttonStyle(PuffyStyle(color: .white, height: 52, strong: false))
                 .opacity(phase >= 2 ? 1 : 0)
                 .padding(.horizontal, 24)
                 .padding(.bottom, 20)
         }
         .contentShape(Rectangle())
-        .onTapGesture { if phase >= 2 { withAnimation { phase = 3 } } }
+        .onTapGesture { if phase >= 2 { next() } }
+    }
+
+    /// おかえり → 収穫（実があれば）→ 結果カード
+    private func next() {
+        withAnimation {
+            if life.pendingHarvest != nil { harvesting = true } else { phase = 3 }
+        }
     }
 
     /// 3拍子

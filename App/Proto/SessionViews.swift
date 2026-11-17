@@ -634,6 +634,12 @@ struct SessionRunView: View {
                 } else {
                     SleepingDog()
                 }
+                if AppMode.launch {
+                    // はたけ：セッション中だけ育つ
+                    SproutView(growth: min(1, progress))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                        .padding(14)
+                }
                 VStack {
                     HStack(spacing: 6) {
                         Circle().fill(DP.green).frame(width: 7, height: 7)
