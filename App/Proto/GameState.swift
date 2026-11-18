@@ -65,6 +65,7 @@ struct SessionResult: Equatable {
     var purpose = ""
     var goal = 0
     var completed = true      // 最後まで置けた（途中でやめたら false）
+    var livesLeft = 3         // のこったライフ（実のレア度・搭乗券のハート）
 }
 
 enum SessionFlow: Equatable {
@@ -98,7 +99,7 @@ final class GameState: ObservableObject {
     @Published var sessionGoal: Int { didSet { Self.ud.set(sessionGoal, forKey: "p.sGoal") } }
     @Published var sessionPurpose: String { didSet { Self.ud.set(sessionPurpose, forKey: "p.sPurpose") } }
     @Published var demoBoost: Double = 0   // デモ用：タイマーを進める秒数
-    @Published var lives: Int { didSet { Self.ud.set(lives, forKey: "p.lives") } }
+    @Published var lives: Int { didSet { Self.ud.set(lives, forKey: "p.lives"); Shields.sessionLives = lives } }
     /// 中断（ライフ−1）で、ブロックを止めている終わりの時刻
     @Published var peekUntil: Date? { didSet { Self.ud.set(peekUntil?.timeIntervalSince1970, forKey: "p.peek") } }
     /// 中断中はタイマーを止める（止めていた合計秒・いまの中断の開始）
@@ -286,6 +287,7 @@ final class GameState: ObservableObject {
         peekUntil = nil
         peekStart = nil
         pausedTotal = 0
+        Shields.sessionRunning = true
         SessionShield.on()
         Haptic.success()
         flow = .running
@@ -300,6 +302,7 @@ final class GameState: ObservableObject {
         sessionStart = nil
         demoBoost = 0
         peekUntil = nil
+        Shields.sessionRunning = false
         SessionShield.off()
         rollDay()
         let gotBones = minutes / 30
@@ -322,7 +325,7 @@ final class GameState: ObservableObject {
         }
         Haptic.success()
         flow = .result(SessionResult(minutes: minutes, bones: gotBones, stars: gotStars, multiplier: mult, baseBonus: bonus, declared: declaredNow,
-                                     purpose: sessionPurpose, goal: sessionGoal, completed: completed))
+                                     purpose: sessionPurpose, goal: sessionGoal, completed: completed, livesLeft: lives))
     }
 
     /// 中断する：ライフを1つ使って、そのとき決めた分数だけブロックを止める（用途も記録）

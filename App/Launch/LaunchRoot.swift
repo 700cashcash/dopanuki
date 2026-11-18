@@ -67,7 +67,7 @@ struct LaunchRoot: View {
             if d.bool(forKey: "debugNoNightBase") { game.nightBaseSkipped = true }
             if d.bool(forKey: "debugPick") && game.flow == nil { game.flow = .pick }
             if d.bool(forKey: "debugRun") && game.flow == nil {
-                var p = SessionPlan(title: "25分", goalMinutes: 25, lives: 99, peekMinutes: 5, useBase: false)
+                var p = SessionPlan(title: "25分", goalMinutes: 25, lives: 3, peekMinutes: 5, useBase: false)
                 p.purpose = "英単語"
                 game.start(p); game.begin(atBase: false)
             }
@@ -76,7 +76,7 @@ struct LaunchRoot: View {
                                                   bones: 0, stars: 0, purpose: "英単語", goal: 40, completed: !d.bool(forKey: "debugQuit")))
             }
             if d.bool(forKey: "debugDeclare") && game.flow == nil {
-                var p = SessionPlan(title: "40分", goalMinutes: 40, lives: 99, peekMinutes: 5, useBase: false)
+                var p = SessionPlan(title: "40分", goalMinutes: 40, lives: 3, peekMinutes: 5, useBase: false)
                 p.purpose = "英単語"; p.declared = true; p.cardWhen = "21:30まで"
                 game.start(p)
             }

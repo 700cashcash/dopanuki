@@ -692,14 +692,17 @@ struct SessionRunView: View {
                     }
                 }
                 Spacer()
-                if !AppMode.launch {
                 HStack(spacing: 4) {
                     ForEach(0..<game.maxLives, id: \.self) { i in
-                        Image(systemName: i < game.lives ? "heart.fill" : "heart")
+                        // ライフがへると、ハートが割れる
+                        Image(systemName: i < game.lives ? "heart.fill" : "heart.slash")
                             .foregroundColor(i < game.lives ? DP.pink : Color(hex: 0x3A3A3A))
+                            .scaleEffect(i < game.lives ? 1 : 0.85)
+                            .rotationEffect(.degrees(i < game.lives ? 0 : -12))
                     }
                 }
-                }
+                .animation(.spring(response: 0.35, dampingFraction: 0.4), value: game.lives)
+                .accessibilityLabel(Text("ライフ のこり\(game.lives)"))
             }
 
             VStack(spacing: 8) {
@@ -770,10 +773,7 @@ struct SessionRunView: View {
                 .font(.dp(12, .bold)).foregroundColor(DP.dim)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
-            if AppMode.launch && peekLeft == nil {
-                HoldToEndButton { game.finish() }
-                    .frame(maxWidth: .infinity)
-            }
+
         }
         .padding(.horizontal, 24)
         .padding(.top, 8)
@@ -784,7 +784,7 @@ struct SessionRunView: View {
     private func peekButton(peeking: Bool) -> some View {
         if game.lives > 0 {
             Button { askEnd = true } label: {
-                Label(peeking ? "中断中" : (AppMode.launch ? "開きたい" : "中断する（ライフ−1）"), systemImage: "pause.fill")
+                Label(peeking ? "中断中" : (AppMode.launch ? "ちょっとだけ開く（ライフ−1）" : "中断する（ライフ−1）"), systemImage: "pause.fill")
             }
             .buttonStyle(PuffyStyle(color: .white, height: 58, strong: false))
             .disabled(peeking)
@@ -813,7 +813,9 @@ struct SessionRunView: View {
 
     private func footerText(peeking: Bool) -> String {
         if peeking { return "\(game.peekMinutes)分たつか「もどる」で、ブロックとタイマーが再開するよ" }
-        if AppMode.launch { return "時間になったら、じどうでおわるよ" }
+        if AppMode.launch {
+            return game.lives == 0 ? "ライフがなくなっても大丈夫。ここまでの時間はちゃんと残るよ" : "時間になったら、じどうでおわるよ"
+        }
         if game.maxLives == 0 { return "ライフなしモード。⭐ ×" + String(format: "%.1f", rewardMultiplier(lives: game.maxLives, peekMinutes: 0)) }
         if game.lives == 0 { return "ライフがなくなっても大丈夫。ここまでの時間はちゃんと残るよ" }
         return "ゴールの時間になったら、じどうでおわるよ"

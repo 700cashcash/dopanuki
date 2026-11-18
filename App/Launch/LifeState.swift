@@ -20,6 +20,7 @@ struct SavedCard: Codable, Identifiable, Equatable {
     var text = ""        // 期間（宣言）・キモさ（キモ朝）・週のまとめ など
     var number: Int? = nil   // 搭乗券の便名（DPN-0042）
     var fruit: String? = nil // とれた実
+    var lives: Int? = nil    // のこったライフ
 }
 
 /// ちょっとだけ開いた記録
@@ -151,10 +152,11 @@ final class LifeState: ObservableObject {
         data.records.append(SessionRecord(id: r.id, date: Date(), minutes: r.minutes, purpose: r.purpose, completed: r.completed))
         if r.minutes > 0 {
             // セッションごとに たねが1つ。置いた時間で実のレア度が決まる
-            let fruit = Fruit.roll(minutes: r.minutes, completed: r.completed)
-            pendingHarvest = (fruit, !r.completed)
+            let fruit = Fruit.roll(minutes: r.minutes, completed: r.completed, lives: r.livesLeft)
+            pendingHarvest = (fruit, !r.completed || r.livesLeft == 0)
             data.ticketCount += 1
-            data.cards.append(SavedCard(kind: .result, minutes: r.minutes, purpose: r.purpose, number: data.ticketCount, fruit: fruit.id))
+            data.cards.append(SavedCard(kind: .result, minutes: r.minutes, purpose: r.purpose, number: data.ticketCount,
+                                        fruit: fruit.id, lives: r.livesLeft))
         }
         // 合計の取り戻した時間のお祝い（一度だけ）
         let total = totalMinutes

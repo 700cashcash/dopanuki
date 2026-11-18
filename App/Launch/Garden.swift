@@ -30,11 +30,13 @@ struct Fruit: Identifiable, Equatable {
     static func find(_ id: String?) -> Fruit? { all.first { $0.id == id } }
 
     /// 置いた時間でレア度が決まる（長いほど確率アップ）。途中でやめたら小さいノーマル
-    static func roll(minutes m: Int, completed: Bool) -> Fruit {
+    /// のこったライフでも補正：3こ ×1.5、2こ ×1.2、1こ ×1.0、0こ 小さい実
+    static func roll(minutes m: Int, completed: Bool, lives: Int = 3) -> Fruit {
         let pool = { (r: Int) in all.filter { $0.rarity == r }.randomElement()! }
-        guard completed else { return pool(0) }
-        let ss = m >= 60 ? min(0.05 + Double(m - 60) / 600, 0.4) : 0
-        let rare = m >= 25 ? min(0.15 + Double(m - 25) / 200, 0.55) : 0.02
+        guard completed, lives > 0 else { return pool(0) }
+        let boost = [0, 1.0, 1.2, 1.5][min(max(lives, 0), 3)]
+        let ss = (m >= 60 ? min(0.05 + Double(m - 60) / 600, 0.4) : 0) * boost
+        let rare = (m >= 25 ? min(0.15 + Double(m - 25) / 200, 0.55) : 0.02) * boost
         let x = Double.random(in: 0..<1)
         if x < ss { return pool(2) }
         if x < ss + rare { return pool(1) }

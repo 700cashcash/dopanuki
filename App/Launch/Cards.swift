@@ -230,6 +230,15 @@ struct BoardingPass: View {
                     Spacer()
                     field("GATE", "基地")
                 }
+                if let l = card.lives, card.kind == .result {
+                    HStack(spacing: 3) {
+                        Text("LIFE").font(.system(size: 9, weight: .heavy)).foregroundColor(ink.opacity(0.5))
+                        ForEach(0..<3, id: \.self) { i in
+                            Image(systemName: i < l ? "heart.fill" : "heart").font(.system(size: 11, weight: .bold))
+                                .foregroundColor(i < l ? DP.pink : ink.opacity(0.25))
+                        }
+                    }
+                }
                 VStack(alignment: .leading, spacing: 2) {
                     Text(gold ? "TOTAL" : "取り戻した時間").font(.system(size: 10, weight: .heavy)).foregroundColor(ink.opacity(0.5))
                     Text(minutesText).font(.system(size: 40, weight: .black)).foregroundColor(accent)

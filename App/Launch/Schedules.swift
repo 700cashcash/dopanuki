@@ -130,6 +130,45 @@ struct PreOpenView: View {
 
     private let reasons = ["LINEの返信", "連絡・電話", "調べもの", "地図・乗りかえ", "写真", "そのほか"]
     private let lengths = [1, 3, 5, 10, 15, 30, 60]
+    /// どのライフを使うか（セッション・1日の目標・毎日の時間）
+    private var ctx: Shields.LifeContext? {
+        if game.sessionStart != nil { return .session }
+        return Shields.context()
+    }
+    private var livesLeft: Int {
+        guard let c = ctx else { return 3 }
+        return c == .session ? game.lives : Shields.lives(c)
+    }
+
+    /// ライフ0：「ちょっとだけ開く」はなし。ここまでにする
+    private var outOfLives: some View {
+        VStack(spacing: 18) {
+            Spacer()
+            DogView(size: 150, mood: .normal, pose: DogPose(headTilt: -6), alive: true)
+            Bubble(text: "ライフがもうないよ。きょうは ここまでにしよ？")
+            Text("ここまでの時間は、ちゃんと残るよ").font(.dp(13, .bold)).foregroundColor(DP.gray)
+            Spacer()
+            Button {
+                Haptic.success()
+                if ctx == .session { game.finish() }
+                dismiss()
+            } label: { Text("ここまでにする") }
+                .buttonStyle(PuffyStyle(color: .yellow, height: 56))
+            Button("もうすこし がんばる") { dismiss() }
+                .font(.dp(14, .heavy)).foregroundColor(DP.gray)
+        }
+        .padding(24)
+    }
+
+    private var hearts: some View {
+        HStack(spacing: 3) {
+            ForEach(0..<3, id: \.self) { i in
+                Image(systemName: i < livesLeft ? "heart.fill" : "heart.slash")
+                    .foregroundColor(i < livesLeft ? DP.pink : DP.dim)
+            }
+        }
+    }
+
     private var chosen: String {
         let c = custom.trimmingCharacters(in: .whitespaces)
         return c.isEmpty ? (purpose == "そのほか" ? "" : purpose) : c
@@ -139,9 +178,13 @@ struct PreOpenView: View {
         ZStack {
             DP.bg.ignoresSafeArea()
             TopGlow(color: DP.purple.opacity(0.6), reach: 0.5)
-            switch step {
-            case 0: breath
-            default: form
+            if livesLeft == 0 {
+                outOfLives
+            } else {
+                switch step {
+                case 0: breath
+                default: form
+                }
             }
         }
         .preferredColorScheme(.dark)
@@ -188,6 +231,7 @@ struct PreOpenView: View {
                 HStack {
                     Button { dismiss() } label: { CircleIcon(system: "xmark") }.buttonStyle(PressStyle())
                     Spacer()
+                    hearts
                 }
                 HStack(spacing: 10) {
                     DogView(size: 64, mood: .normal, alive: true)
@@ -204,7 +248,7 @@ struct PreOpenView: View {
                 }
                 Text("時間になったら、またブロックにもどるよ").font(.dp(12, .bold)).foregroundColor(DP.dim)
                 Button(action: open) {
-                    Label(chosen.isEmpty ? "何しに開くか えらんでね" : "\(minutes)分だけ開く", systemImage: "lock.open.fill")
+                    Label(chosen.isEmpty ? "何しに開くか えらんでね" : "\(minutes)分だけ開く（ライフ−1）", systemImage: "lock.open.fill")
                 }
                 .buttonStyle(PuffyStyle(color: .white, height: 56, strong: false))
                 .disabled(chosen.isEmpty)
@@ -218,8 +262,11 @@ struct PreOpenView: View {
 
     private func open() {
         life.data.opens.append(OpenLog(purpose: chosen, minutes: minutes))
+        Haptic.soft(0.7)   // ハートが割れる（責めない）
         if game.sessionStart != nil && game.peekUntil == nil {
-            game.peek(minutes: minutes, reason: chosen)      // セッションのタイマーは止まる
+            game.peek(minutes: minutes, reason: chosen)      // セッションのタイマーは止まる・ライフ−1
+        } else if let c = ctx, c != .session {
+            Shields.useLife(c)                               // 1日の目標・毎日の時間のライフ−1
         }
         #if !DEMO
         Shields.unlock(minutes: minutes)                     // 夜・目標・毎日の時間のブロックも外す（あとで戻す）

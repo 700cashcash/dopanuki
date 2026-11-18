@@ -205,7 +205,7 @@ struct OnboardingView: View {
             Spacer(minLength: 0)
             Button {
                 life.data.onboarded = true
-                var p = SessionPlan(title: "3分", goalMinutes: 3, lives: 99, peekMinutes: 5, useBase: false)
+                var p = SessionPlan(title: "3分", goalMinutes: 3, lives: 3, peekMinutes: 5, useBase: false)
                 p.purpose = "はじめての3分"
                 game.start(p)
             } label: { Label("3分 置いてみる", systemImage: "play.fill") }

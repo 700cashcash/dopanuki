@@ -94,7 +94,7 @@ struct LaunchPickView: View {
     }
 
     private func start() {
-        var p = SessionPlan(title: title, goalMinutes: goalMinutes, lives: 99, peekMinutes: 5, useBase: false)
+        var p = SessionPlan(title: title, goalMinutes: goalMinutes, lives: 3, peekMinutes: 5, useBase: false)
         p.purpose = chosen
         p.declared = true
         p.cardWhen = night ? "あしたの朝まで" : SessionPickView.whenText(minutes: goalMinutes, unit: unit, value: Int(value))

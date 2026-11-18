@@ -162,3 +162,50 @@ enum Shields {
         UNUserNotificationCenter.current().add(req)
     }
 }
+
+/// ライフ：セッション・1日の目標・毎日の時間それぞれ3つ。「ちょっとだけ開く」で1つへる
+extension Shields {
+    enum LifeContext { case session, goal, routine }
+
+    /// アプリでセッション中か（中断中もふくむ）
+    static var sessionRunning: Bool {
+        get { SharedSettings.defaults.bool(forKey: "sessionRunning") }
+        set { SharedSettings.defaults.set(newValue, forKey: "sessionRunning") }
+    }
+    static var sessionLives: Int {
+        get { SharedSettings.defaults.object(forKey: "sessionLives") as? Int ?? 3 }
+        set { SharedSettings.defaults.set(newValue, forKey: "sessionLives") }
+    }
+
+    /// いま、どのブロックで止まっているか（夜は「ちょっとだけ開く」なし → nil）
+    static func context(now: Date = Date()) -> LifeContext? {
+        if sessionRunning { return .session }
+        if isNight(now) { return nil }
+        if isRoutine(now) { return .routine }
+        if SharedSettings.goalEnabled && goalHitToday { return .goal }
+        return nil
+    }
+
+    static func lives(_ c: LifeContext) -> Int {
+        switch c {
+        case .session: return sessionLives
+        case .goal: return SharedSettings.defaults.object(forKey: "goalLives." + dayKey()) as? Int ?? 3
+        case .routine: return SharedSettings.defaults.object(forKey: "routineLives." + dayKey()) as? Int ?? 3
+        }
+    }
+
+    static func useLife(_ c: LifeContext) {
+        let n = max(0, lives(c) - 1)
+        switch c {
+        case .session: sessionLives = n
+        case .goal: SharedSettings.defaults.set(n, forKey: "goalLives." + dayKey())
+        case .routine: SharedSettings.defaults.set(n, forKey: "routineLives." + dayKey())
+        }
+    }
+
+    /// ブロック画面に「ちょっとだけ開く」を出すか
+    static var canPeek: Bool {
+        guard let c = context() else { return false }
+        return lives(c) > 0
+    }
+}
